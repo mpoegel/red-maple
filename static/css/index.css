@@ -1,0 +1,187 @@
+@font-face {
+    font-family: DepartureMono-Regular;
+    src: url(/vendor/departure-mono/DepartureMono-Regular.woff2);
+}
+
+body {
+    height: 100%;
+    width: 100%;
+
+    max-height: 400px;
+    max-width: 800px;
+
+    font-family: DepartureMono-Regular;
+    margin: 5px auto;
+}
+
+
+#main-grid .grid-cell-2xn {
+    border: 2px solid black;
+    width: 100%;
+}
+
+.grid {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.inline-grid {
+    display: inline-flex;
+    flex-wrap: wrap;
+    vertical-align: top;
+}
+
+.grid-cell-1xn {
+    flex-basis: 100%;
+    padding: 3px;
+}
+
+.grid-cell-2xn {
+    flex-basis: 48.7%;
+    padding: 3px;
+}
+
+.grid-cell-level-indicator {
+    flex-basis: 5%;
+}
+
+.grid-cell-level-label {
+    flex-basis: 80%;
+    border: 1px solid black;
+}
+
+#weather-today {
+    font-size: 64px;
+    margin: 5px;
+}
+
+.temp-today {
+    width: 20%;
+}
+
+.forecast {
+    width: 50%;
+}
+
+.integer-part {
+    font-size: 64px;
+}
+
+.humidity {
+    padding-top: 20px;
+    font-size: 9px;
+    width: 50px;
+}
+
+.humidity-humid {
+    color: white;
+    background: #46399e;
+    background: linear-gradient(90deg, rgba(70, 57, 158, 1) 0%, rgba(57, 128, 158, 1) 50%, rgba(57, 158, 99, 1) 100%);
+}
+
+.humidity-healthy {
+    color: white;
+    background: #39809e;
+    background: linear-gradient(90deg, rgba(57, 128, 158, 1) 0%, rgba(57, 158, 99, 1) 50%, rgba(237, 221, 83, 1) 100%);
+}
+
+.humidity-dry {
+    background: #EDDD53;
+    background: linear-gradient(90deg, rgba(237, 221, 83, 1) 0%, rgba(158, 94, 57, 1) 50%, rgba(158, 69, 57, 1) 100%);
+}
+
+/* 
+blue #46399E
+light blue #39809E
+green #399E63
+yellow #EDDD53
+orange 9E5E39
+red 9E4539
+*/
+
+.train-table {
+    width: 45%;
+}
+
+.train-line {
+    font-size: 20px;
+}
+
+.next-train {
+    font-size: 54px;
+}
+
+.train-details {
+    font-size: 12px;
+    width: 50%;
+}
+
+.bike-table {
+    width: 45%;
+}
+
+.bike-station {
+    font-size: 14px;
+    text-wrap-mode: nowrap;
+    overflow: hidden;
+}
+
+.total-bikes {
+    font-size: 54px;
+}
+
+.bike-details {
+    width: 50%;
+}
+
+#sun-table {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+#sun-symbols {
+    flex-basis: 25%;
+    font-size: 32px;
+    text-align: center;
+}
+
+#sun-city {
+    flex-basis: 20%;
+    font-size: 24px;
+    text-align: center;
+}
+
+#sun-times {
+    flex-basis: 55%;
+    font-size: 32px;
+    text-align: center;
+}
+
+.sun-spacer {
+    font-size: 2px;
+}
+
+#datetime {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+#timestamp {
+    font-size: 64px;
+}
+
+#navigation {
+    font-size: 22px;
+    text-align: center;
+    display: flex;
+    height: 100%;
+    align-items: center;
+}
+
+#navigation div {
+    width: 100%;
+}
