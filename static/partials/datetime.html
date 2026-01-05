@@ -1,14 +1,14 @@
 {{define "Datetime"}}
 <div id="datetime">
     <div>
-        <span id="timestamp">2:58</span>
+        <span id="timestamp">{{.Timestamp}}</span>
         <span class="inline-grid">
-            <div class="grid-cell-1xn">PM</div>
+            <div class="grid-cell-1xn">{{.AMOrPM}}</div>
             <div class="grid-cell-1xn">&nbsp;</div>
-            <div class="grid-cell-1xn">:42</div>
+            <div class="grid-cell-1xn">:{{.Seconds}}</div>
         </span>
 
-        <div>SUNDAY JAN 04 2026</div>
+        <div>{{.Date}}</div>
     </div>
 </div>
 {{end}}

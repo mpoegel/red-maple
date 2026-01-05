@@ -7,16 +7,25 @@ import (
 	"log/slog"
 	"net/http"
 	"path"
+	"strings"
 	"time"
+
+	api "github.com/mpoegel/red-maple/pkg/api"
 )
 
 type Server struct {
 	s      http.Server
 	config Config
+	tz     *time.Location
 }
 
 func NewServer(config Config) (*Server, error) {
 	mux := http.NewServeMux()
+
+	tz, err := time.LoadLocation(config.Timezone)
+	if err != nil {
+		return nil, err
+	}
 
 	s := Server{
 		s: http.Server{
@@ -26,6 +35,7 @@ func NewServer(config Config) (*Server, error) {
 			Handler:      mux,
 		},
 		config: config,
+		tz:     tz,
 	}
 
 	s.LoadRoutes(mux)
@@ -35,6 +45,7 @@ func NewServer(config Config) (*Server, error) {
 
 func (s *Server) LoadRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /{$}", s.HandleIndex)
+	mux.HandleFunc("GET /x/datetime", s.HandleDatetime)
 
 	mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.Dir(s.config.StaticDir))))
 
@@ -59,6 +70,29 @@ func (s *Server) Stop(ctx context.Context) {
 
 func (s *Server) HandleIndex(w http.ResponseWriter, r *http.Request) {
 	s.executeTemplate(w, "Index", struct{}{})
+}
+
+func (s *Server) HandleDatetime(w http.ResponseWriter, r *http.Request) {
+	now := time.Now().In(s.tz)
+	AMorPM := "AM"
+	hour := now.Hour()
+	if now.Hour() >= 12 {
+		AMorPM = "PM"
+	}
+	if hour > 13 {
+		hour -= 12
+	}
+	s.executeTemplate(w, "Datetime", api.DatetimePartial{
+		Timestamp: fmt.Sprintf("%02d:%02d", hour, now.Minute()),
+		AMOrPM:    AMorPM,
+		Seconds:   fmt.Sprintf("%02d", now.Second()),
+		Date: fmt.Sprintf("%s %s %02d %d",
+			strings.ToUpper(now.Weekday().String()),
+			strings.ToUpper(now.Month().String())[:3],
+			now.Day(),
+			now.Year(),
+		),
+	})
 }
 
 func (s *Server) loadTemplates(w http.ResponseWriter) *template.Template {

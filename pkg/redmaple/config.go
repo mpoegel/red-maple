@@ -10,6 +10,7 @@ type Config struct {
 	Port      int
 	StaticDir string
 	VendorDir string
+	Timezone  string
 }
 
 func LoadConfig() Config {
@@ -17,6 +18,7 @@ func LoadConfig() Config {
 		Port:      loadIntEnv("PORT", 6556),
 		StaticDir: loadStrEnv("STATIC_DIR", "./static"),
 		VendorDir: loadStrEnv("VENDOR_DIR", "./vendor"),
+		Timezone:  loadStrEnv("TIMEZONE", "America/New_York"),
 	}
 }
 

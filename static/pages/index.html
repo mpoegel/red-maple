@@ -24,14 +24,15 @@
         <div class="grid-cell-2xn">
             {{template "Sunrise"}}
         </div>
-        <div class="grid-cell-2xn">
-            {{template "Datetime"}}
+        <div class="grid-cell-2xn" hx-get="/x/datetime" hx-trigger="load, every 1s">
         </div>
         <div class="grid-cell-2xn">
             {{template "Navigation"}}
         </div>
     </div>
 </body>
+
+<script src="/static/js/index.js"></script>
 
 </html>
 {{end}}

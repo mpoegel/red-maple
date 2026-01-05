@@ -14,6 +14,9 @@ body {
     margin: 5px auto;
 }
 
+.request-error {
+    background-color: #9E4539;
+}
 
 #main-grid .grid-cell-2xn {
     border: 2px solid black;
