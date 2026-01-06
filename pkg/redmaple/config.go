@@ -7,18 +7,20 @@ import (
 )
 
 type Config struct {
-	Port      int
-	StaticDir string
-	VendorDir string
-	Timezone  string
+	Port             int
+	StaticDir        string
+	VendorDir        string
+	Timezone         string
+	CitibikeStations string
 }
 
 func LoadConfig() Config {
 	return Config{
-		Port:      loadIntEnv("PORT", 6556),
-		StaticDir: loadStrEnv("STATIC_DIR", "./static"),
-		VendorDir: loadStrEnv("VENDOR_DIR", "./vendor"),
-		Timezone:  loadStrEnv("TIMEZONE", "America/New_York"),
+		Port:             loadIntEnv("PORT", 6556),
+		StaticDir:        loadStrEnv("STATIC_DIR", "./static"),
+		VendorDir:        loadStrEnv("VENDOR_DIR", "./vendor"),
+		Timezone:         loadStrEnv("TIMEZONE", "America/New_York"),
+		CitibikeStations: loadStrEnv("CITIBIKE_STATIONS", "Park Ave & E 42 St,Park Ave & E 41 St"),
 	}
 }
 

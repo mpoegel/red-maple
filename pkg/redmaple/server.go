@@ -11,12 +11,16 @@ import (
 	"time"
 
 	api "github.com/mpoegel/red-maple/pkg/api"
+	citibike "github.com/mpoegel/red-maple/pkg/citibike"
 )
 
 type Server struct {
 	s      http.Server
 	config Config
 	tz     *time.Location
+
+	citibikeStations []string
+	citibike         citibike.Client
 }
 
 func NewServer(config Config) (*Server, error) {
@@ -34,9 +38,18 @@ func NewServer(config Config) (*Server, error) {
 			WriteTimeout: 10 * time.Second,
 			Handler:      mux,
 		},
-		config: config,
-		tz:     tz,
+		config:   config,
+		tz:       tz,
+		citibike: citibike.NewCachedClient(),
 	}
+
+	stationNames := strings.Split(config.CitibikeStations, ",")
+	stations, err := loadCitibikeStations(context.TODO(), s.citibike, stationNames)
+	if err != nil {
+		return nil, err
+	}
+	s.citibikeStations = stations
+	slog.Debug("preloaded citibike", "stations", stations, "names", stationNames)
 
 	s.LoadRoutes(mux)
 
@@ -46,6 +59,7 @@ func NewServer(config Config) (*Server, error) {
 func (s *Server) LoadRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /{$}", s.HandleIndex)
 	mux.HandleFunc("GET /x/datetime", s.HandleDatetime)
+	mux.HandleFunc("GET /x/citibike", s.HandleCitibike)
 
 	mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.Dir(s.config.StaticDir))))
 
