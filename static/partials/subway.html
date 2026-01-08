@@ -2,25 +2,37 @@
 <div>
 
     <span class="inline-grid train-table">
-        <div class="grid-cell-1xn train-line"><i class="wi wi-train"></i> L</div>
+        <div class="grid-cell-1xn train-line"><i class="wi wi-train"></i> {{.First.TrainLine}} {{.First.StopName}}
+        </div>
         <div class="grid-cell-1xn">
-            <span class="next-train">5</span>
+            <span class="next-train">{{.First.NextTrainIn}}</span>
             <span class="inline-grid train-details">
-                <div class="grid-cell-1xn">8th Avenue</div>
-                <div class="grid-cell-1xn">&nbsp;</div>
-                <div class="grid-cell-1xn">» 10, 15</div>
+                <div class="grid-cell-1xn">{{.First.Destination}}</div>
+                <div class="grid-cell-1xn">{{if .First.HasIssues}}⌘ issues{{else}}&nbsp;{{end}}</div>
+                <div class="grid-cell-1xn">»
+                    {{ range $index, $train := .First.FurtherTrains -}}
+                    {{- if $index -}}, {{ end -}}
+                    {{- $train -}}
+                    {{- end -}}
+                </div>
             </span>
         </div>
     </span>
 
     <span class="inline-grid train-table">
-        <div class="grid-cell-1xn train-line"><i class="wi wi-train"></i> G</div>
+        <div class="grid-cell-1xn train-line"><i class="wi wi-train"></i> {{.Second.TrainLine}} {{.Second.StopName}}
+        </div>
         <div class="grid-cell-1xn">
-            <span class="next-train">1</span>
+            <span class="next-train">{{.Second.NextTrainIn}}</span>
             <span class="inline-grid train-details">
-                <div class="grid-cell-1xn">Court Sq</div>
-                <div class="grid-cell-1xn">⌘ issues</div>
-                <div class="grid-cell-1xn">» 10, 16</div>
+                <div class="grid-cell-1xn">{{.Second.Destination}}</div>
+                <div class="grid-cell-1xn">{{if .Second.HasIssues}}⌘ issues{{else}}&nbsp;{{end}}</div>
+                <div class="grid-cell-1xn">»
+                    {{ range $index, $train := .Second.FurtherTrains -}}
+                    {{- if $index -}}, {{ end -}}
+                    {{- $train -}}
+                    {{- end -}}
+                </div>
             </span>
         </div>
     </span>

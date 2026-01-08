@@ -12,15 +12,17 @@ type Config struct {
 	VendorDir        string
 	Timezone         string
 	CitibikeStations string
+	SubwayStops      string
 }
 
 func LoadConfig() Config {
 	return Config{
 		Port:             loadIntEnv("PORT", 6556),
 		StaticDir:        loadStrEnv("STATIC_DIR", "./static"),
-		VendorDir:        loadStrEnv("VENDOR_DIR", "./vendor"),
+		VendorDir:        loadStrEnv("VENDOR_DIR", "./vendored"),
 		Timezone:         loadStrEnv("TIMEZONE", "America/New_York"),
 		CitibikeStations: loadStrEnv("CITIBIKE_STATIONS", "Park Ave & E 42 St,Park Ave & E 41 St"),
+		SubwayStops:      loadStrEnv("SUBWAY_STOPS", "L03S,G29N"),
 	}
 }
 

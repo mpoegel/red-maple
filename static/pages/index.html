@@ -12,13 +12,11 @@
         <div class="grid-cell-2xn">
             {{template "Indoor"}}
         </div>
-        <div class="grid-cell-2xn">
-            {{template "Subway"}}
-        </div>
+        <div class="grid-cell-2xn" hx-get="/x/subway" hx-trigger="load, every 1m"></div>
         <div class="grid-cell-2xn">
             {{template "Outdoor"}}
         </div>
-        <div class="grid-cell-2xn" hx-get="/x/citibike" , hx-trigger="load, every 5m"></div>
+        <div class="grid-cell-2xn" hx-get="/x/citibike" hx-trigger="load, every 5m"></div>
         <div class="grid-cell-2xn">
             {{template "Sunrise"}}
         </div>

@@ -108,6 +108,16 @@ red 9E4539
 
 .train-line {
     font-size: 20px;
+    width: 100%;
+    text-wrap-mode: nowrap;
+    overflow: hidden;
+}
+
+.subway-stop {
+    font-size: 12px;
+    width: 100%;
+    text-wrap-mode: nowrap;
+    overflow: hidden;
 }
 
 .next-train {
@@ -117,6 +127,12 @@ red 9E4539
 .train-details {
     font-size: 12px;
     width: 50%;
+}
+
+.train-details div {
+    width: 100%;
+    text-wrap-mode: nowrap;
+    overflow: hidden;
 }
 
 .bike-table {

@@ -12,6 +12,7 @@ import (
 
 	api "github.com/mpoegel/red-maple/pkg/api"
 	citibike "github.com/mpoegel/red-maple/pkg/citibike"
+	subway "github.com/mpoegel/red-maple/pkg/subway"
 )
 
 type Server struct {
@@ -21,12 +22,19 @@ type Server struct {
 
 	citibikeStations []string
 	citibike         citibike.Client
+
+	subwayCli subway.Client
 }
 
 func NewServer(config Config) (*Server, error) {
 	mux := http.NewServeMux()
 
 	tz, err := time.LoadLocation(config.Timezone)
+	if err != nil {
+		return nil, err
+	}
+
+	subwayCli, err := subway.NewClient(config.VendorDir)
 	if err != nil {
 		return nil, err
 	}
@@ -38,9 +46,10 @@ func NewServer(config Config) (*Server, error) {
 			WriteTimeout: 10 * time.Second,
 			Handler:      mux,
 		},
-		config:   config,
-		tz:       tz,
-		citibike: citibike.NewCachedClient(),
+		config:    config,
+		tz:        tz,
+		citibike:  citibike.NewCachedClient(),
+		subwayCli: subwayCli,
 	}
 
 	stationNames := strings.Split(config.CitibikeStations, ",")
@@ -60,6 +69,7 @@ func (s *Server) LoadRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /{$}", s.HandleIndex)
 	mux.HandleFunc("GET /x/datetime", s.HandleDatetime)
 	mux.HandleFunc("GET /x/citibike", s.HandleCitibike)
+	mux.HandleFunc("GET /x/subway", s.HandleSubway)
 
 	mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.Dir(s.config.StaticDir))))
 

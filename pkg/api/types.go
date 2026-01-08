@@ -18,3 +18,17 @@ type CitibikeStation struct {
 	NumBikes   int
 	NumEbikes  int
 }
+
+type SubwayPartial struct {
+	First  SubwayUpdate
+	Second SubwayUpdate
+}
+
+type SubwayUpdate struct {
+	TrainLine     string
+	StopName      string
+	NextTrainIn   int
+	Destination   string
+	HasIssues     bool
+	FurtherTrains []int
+}
