@@ -2,17 +2,20 @@ package redmaple
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"html/template"
 	"log/slog"
 	"net/http"
 	"path"
+	"strconv"
 	"strings"
 	"time"
 
 	api "github.com/mpoegel/red-maple/pkg/api"
 	citibike "github.com/mpoegel/red-maple/pkg/citibike"
 	subway "github.com/mpoegel/red-maple/pkg/subway"
+	weather "github.com/mpoegel/red-maple/pkg/weather"
 )
 
 type Server struct {
@@ -24,6 +27,8 @@ type Server struct {
 	citibike         citibike.Client
 
 	subwayCli subway.Client
+
+	weatherCli weather.Client
 }
 
 func NewServer(config Config) (*Server, error) {
@@ -39,6 +44,16 @@ func NewServer(config Config) (*Server, error) {
 		return nil, err
 	}
 
+	weatherCoords := strings.Split(config.WeatherLocation, ",")
+	if len(weatherCoords) != 2 {
+		return nil, errors.New("invalid weather coordinates")
+	}
+	weatherLat, err1 := strconv.ParseFloat(weatherCoords[0], 64)
+	weatherLon, err2 := strconv.ParseFloat(weatherCoords[1], 64)
+	if err1 != nil || err2 != nil {
+		return nil, errors.Join(err1, err2)
+	}
+
 	s := Server{
 		s: http.Server{
 			Addr:         fmt.Sprintf("0.0.0.0:%d", config.Port),
@@ -46,10 +61,11 @@ func NewServer(config Config) (*Server, error) {
 			WriteTimeout: 10 * time.Second,
 			Handler:      mux,
 		},
-		config:    config,
-		tz:        tz,
-		citibike:  citibike.NewCachedClient(),
-		subwayCli: subwayCli,
+		config:     config,
+		tz:         tz,
+		citibike:   citibike.NewCachedClient(),
+		subwayCli:  subwayCli,
+		weatherCli: weather.NewClient(weatherLat, weatherLon, config.WeatherAPIKey),
 	}
 
 	stationNames := strings.Split(config.CitibikeStations, ",")
@@ -70,6 +86,7 @@ func (s *Server) LoadRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /x/datetime", s.HandleDatetime)
 	mux.HandleFunc("GET /x/citibike", s.HandleCitibike)
 	mux.HandleFunc("GET /x/subway", s.HandleSubway)
+	mux.HandleFunc("GET /x/weather", s.HandleWeather)
 
 	mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.Dir(s.config.StaticDir))))
 

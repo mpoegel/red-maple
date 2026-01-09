@@ -2,18 +2,21 @@
 <div>
     <div>FORECAST</div>
 
-    <i id="weather-today" class="wi wi-day-sunny"></i>
+    <i id="weather-today" class="wi wi-owm-{{.CurrentWeatherIcon}}"></i>
 
     <span class="inline-grid temp-today">
-        <div class="grid-cell-1xn">35 ºF</div>
-        <div class="grid-cell-1xn">10% <i class="wi wi-raindrop"></i></div>
-        <div class="grid-cell-1xn">21 ºF</div>
+        <div class="grid-cell-1xn">{{.TodayHighTemp}} ºF</div>
+        <div class="grid-cell-1xn">{{.TodayRainChance}}% <i class="wi wi-raindrop"></i></div>
+        <div class="grid-cell-1xn">{{.TodayLowTemp}} ºF</div>
     </span>
 
     <span class="inline-grid forecast">
-        <div class="grid-cell-1xn">MON <i class="wi wi-day-cloudy"></i> 50% ↗42 ↘23 </div>
-        <div class="grid-cell-1xn">TUE <i class="wi wi-day-sunny"></i> 0% ↗21 ↘9 </div>
-        <div class="grid-cell-1xn">WED <i class="wi wi-day-sunny"></i> 10% ↗20 ↘13 </div>
+        {{range .Forecast}}
+        <div class="grid-cell-1xn">{{.DayOfWeek}} <i class="wi wi-owm-{{.WeatherIcon}}"></i> {{.RainChance}}%
+            ↗{{.HighTemp}} ↘{{.LowTemp}}</div>
+        {{end}}
+        <!-- <div class="grid-cell-1xn">TUE <i class="wi wi-day-sunny"></i> 0% ↗21 ↘9 </div> -->
+        <!-- <div class="grid-cell-1xn">WED <i class="wi wi-day-sunny"></i> 10% ↗20 ↘13 </div> -->
     </span>
 
 </div>

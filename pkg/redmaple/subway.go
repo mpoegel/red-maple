@@ -21,15 +21,19 @@ func (s *Server) HandleSubway(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusServiceUnavailable)
 		return
 	}
-	data.First.StopName = resp[0].Stop.Name
-	data.First.Destination = resp[0].Destination.Name
-	data.First.HasIssues = len(alerts) > 0
-	data.First.NextTrainIn = minutesUntilArrival(*resp[0].Arrival.Time, s.tz)
-	data.First.TrainLine = string(subway.StopIdToLine(stops[0]))
-	data.First.FurtherTrains = []int{
-		minutesUntilArrival(*resp[1].Arrival.Time, s.tz),
-		minutesUntilArrival(*resp[2].Arrival.Time, s.tz),
+	if len(resp) == 0 {
+		slog.Warn("no trips found", "stop", stops[0])
+	} else {
+		data.First.StopName = resp[0].Stop.Name
+		data.First.Destination = resp[0].Destination.Name
+		data.First.NextTrainIn = minutesUntilArrival(*resp[0].Arrival.Time, s.tz)
+		data.First.FurtherTrains = []int{
+			minutesUntilArrival(*resp[1].Arrival.Time, s.tz),
+			minutesUntilArrival(*resp[2].Arrival.Time, s.tz),
+		}
 	}
+	data.First.TrainLine = string(subway.StopIdToLine(stops[0]))
+	data.First.HasIssues = len(alerts) > 0
 
 	resp, alerts, err = s.subwayCli.GetTripsAtStop(r.Context(), stops[1])
 	if err != nil {
@@ -37,15 +41,20 @@ func (s *Server) HandleSubway(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusServiceUnavailable)
 		return
 	}
-	data.Second.StopName = resp[0].Stop.Name
-	data.Second.Destination = resp[0].Destination.Name
-	data.Second.HasIssues = len(alerts) > 0
-	data.Second.NextTrainIn = minutesUntilArrival(*resp[0].Arrival.Time, s.tz)
-	data.Second.TrainLine = string(subway.StopIdToLine(stops[1]))
-	data.Second.FurtherTrains = []int{
-		minutesUntilArrival(*resp[1].Arrival.Time, s.tz),
-		minutesUntilArrival(*resp[2].Arrival.Time, s.tz),
+	if len(resp) == 0 {
+		slog.Warn("no trips found", "stop", stops[1])
+	} else {
+		data.Second.StopName = resp[0].Stop.Name
+		data.Second.Destination = resp[0].Destination.Name
+		data.Second.NextTrainIn = minutesUntilArrival(*resp[0].Arrival.Time, s.tz)
+		data.Second.FurtherTrains = []int{
+			minutesUntilArrival(*resp[1].Arrival.Time, s.tz),
+			minutesUntilArrival(*resp[2].Arrival.Time, s.tz),
+		}
 	}
+	data.Second.TrainLine = string(subway.StopIdToLine(stops[1]))
+	data.Second.HasIssues = len(alerts) > 0
+
 	slog.Debug("prepared subway partial", "data", data)
 
 	s.executeTemplate(w, "Subway", data)

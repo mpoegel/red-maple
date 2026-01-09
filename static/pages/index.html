@@ -6,9 +6,7 @@
 
 <body>
     <div class="grid" id="main-grid">
-        <div class="grid-cell-2xn">
-            {{template "Forecast"}}
-        </div>
+        <div class="grid-cell-2xn" hx-get="/x/weather" hx-trigger="load, every 10m"></div>
         <div class="grid-cell-2xn">
             {{template "Indoor"}}
         </div>

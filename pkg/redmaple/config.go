@@ -13,6 +13,8 @@ type Config struct {
 	Timezone         string
 	CitibikeStations string
 	SubwayStops      string
+	WeatherLocation  string
+	WeatherAPIKey    string
 }
 
 func LoadConfig() Config {
@@ -23,6 +25,8 @@ func LoadConfig() Config {
 		Timezone:         loadStrEnv("TIMEZONE", "America/New_York"),
 		CitibikeStations: loadStrEnv("CITIBIKE_STATIONS", "Park Ave & E 42 St,Park Ave & E 41 St"),
 		SubwayStops:      loadStrEnv("SUBWAY_STOPS", "L03S,G29N"),
+		WeatherLocation:  loadStrEnv("WEATHER_LOC", "40.75261,-73.97728"),
+		WeatherAPIKey:    loadStrEnv("WEATHER_API_KEY", ""),
 	}
 }
 

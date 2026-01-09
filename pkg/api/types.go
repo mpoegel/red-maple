@@ -32,3 +32,19 @@ type SubwayUpdate struct {
 	HasIssues     bool
 	FurtherTrains []int
 }
+
+type WeatherPartial struct {
+	CurrentWeatherIcon int
+	TodayHighTemp      int
+	TodayLowTemp       int
+	TodayRainChance    int
+	Forecast           []WeatherForecast
+}
+
+type WeatherForecast struct {
+	DayOfWeek   string
+	WeatherIcon int
+	RainChance  int
+	HighTemp    int
+	LowTemp     int
+}
