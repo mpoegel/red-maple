@@ -2,25 +2,25 @@
 <div>
     <div>INDOOR</div>
 
-    <span class="integer-part">75</span>
-    <span class="inline-grid">
+    <span class="integer-part">{{.IntegerTemp}}</span>
+    <span class="inline-grid measurement-label">
         <div class="grid-cell-1xn">ºF</div>
-        <div class="grid-cell-1xn">↗</div>
-        <div class="grid-cell-1xn fractional-part">.4</div>
+        <div class="grid-cell-1xn">{{if .IsTempTrendingUp}}↗{{else}}↘{{end}}</div>
+        <div class="grid-cell-1xn fractional-part">.{{.FractionalTemp}}</div>
     </span>
 
-    <span class="integer-part">52</span>
-    <span class="inline-grid">
+    <span class="integer-part">{{.IntegerHumidity}}</span>
+    <span class="inline-grid measurement-label">
         <div class="grid-cell-1xn">%</div>
-        <div class="grid-cell-1xn">↘</div>
-        <div class="grid-cell-1xn fractional-part">.0</div>
+        <div class="grid-cell-1xn">{{if .IsHumidityTrendingUp}}↗{{else}}↘{{end}}</div>
+        <div class="grid-cell-1xn fractional-part">.{{.FractionalHumidity}}</div>
     </span>
     <span class="inline-grid humidity">
-        <div class="grid-cell-level-indicator">&nbsp;</div>
+        <div class="grid-cell-level-indicator">{{if eq .HumidityLevel 2}}❯{{else}}&nbsp;{{end}}</div>
         <div class="grid-cell-level-label humidity-humid">Humid</div>
-        <div class="grid-cell-level-indicator">❯</div>
+        <div class="grid-cell-level-indicator">{{if eq .HumidityLevel 1}}❯{{else}}&nbsp;{{end}}</div>
         <div class="grid-cell-level-label humidity-healthy">Healthy</div>
-        <div class="grid-cell-level-indicator">&nbsp;</div>
+        <div class="grid-cell-level-indicator">{{if eq .HumidityLevel 0}}❯{{else}}&nbsp;{{end}}</div>
         <div class="grid-cell-level-label humidity-dry">Dry</div>
     </span>
 </div>

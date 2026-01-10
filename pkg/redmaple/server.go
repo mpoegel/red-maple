@@ -14,6 +14,7 @@ import (
 
 	api "github.com/mpoegel/red-maple/pkg/api"
 	citibike "github.com/mpoegel/red-maple/pkg/citibike"
+	ha "github.com/mpoegel/red-maple/pkg/homeassistant"
 	subway "github.com/mpoegel/red-maple/pkg/subway"
 	weather "github.com/mpoegel/red-maple/pkg/weather"
 )
@@ -26,9 +27,9 @@ type Server struct {
 	citibikeStations []string
 	citibike         citibike.Client
 
-	subwayCli subway.Client
-
+	subwayCli  subway.Client
 	weatherCli weather.Client
+	haClient   ha.Client
 }
 
 func NewServer(config Config) (*Server, error) {
@@ -66,6 +67,7 @@ func NewServer(config Config) (*Server, error) {
 		citibike:   citibike.NewCachedClient(),
 		subwayCli:  subwayCli,
 		weatherCli: weather.NewClient(weatherLat, weatherLon, config.WeatherAPIKey),
+		haClient:   ha.NewClient(config.HomeAssistant.Endpoint, config.HomeAssistant.APIKey),
 	}
 
 	stationNames := strings.Split(config.CitibikeStations, ",")
@@ -87,6 +89,8 @@ func (s *Server) LoadRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /x/citibike", s.HandleCitibike)
 	mux.HandleFunc("GET /x/subway", s.HandleSubway)
 	mux.HandleFunc("GET /x/weather", s.HandleWeather)
+	mux.HandleFunc("GET /x/indoor", s.HandleIndoor)
+	mux.HandleFunc("GET /x/outdoor", s.HandleOutdoor)
 
 	mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.Dir(s.config.StaticDir))))
 

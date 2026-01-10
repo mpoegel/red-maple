@@ -59,11 +59,11 @@ body {
 }
 
 .temp-today {
-    width: 15%;
+    width: 17%;
 }
 
 .forecast {
-    width: 55%;
+    width: 53%;
 }
 
 .integer-part {
@@ -74,6 +74,10 @@ body {
     padding-top: 20px;
     font-size: 9px;
     width: 50px;
+}
+
+.measurement-label {
+    width: 40px;
 }
 
 .humidity-humid {

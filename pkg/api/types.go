@@ -48,3 +48,15 @@ type WeatherForecast struct {
 	HighTemp    int
 	LowTemp     int
 }
+
+type IndoorPartial struct {
+	IntegerTemp          int
+	FractionalTemp       int
+	IsTempTrendingUp     bool
+	IntegerHumidity      int
+	FractionalHumidity   int
+	IsHumidityTrendingUp bool
+	HumidityLevel        int
+}
+
+type OutdoorPartial IndoorPartial

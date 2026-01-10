@@ -15,6 +15,16 @@ type Config struct {
 	SubwayStops      string
 	WeatherLocation  string
 	WeatherAPIKey    string
+	HomeAssistant    HomeAssistantConfig
+}
+
+type HomeAssistantConfig struct {
+	Endpoint          string
+	APIKey            string
+	OutdoorTempID     string
+	OutdoorHumidityID string
+	IndoorTempID      string
+	IndoorHumidityID  string
 }
 
 func LoadConfig() Config {
@@ -27,6 +37,14 @@ func LoadConfig() Config {
 		SubwayStops:      loadStrEnv("SUBWAY_STOPS", "L03S,G29N"),
 		WeatherLocation:  loadStrEnv("WEATHER_LOC", "40.75261,-73.97728"),
 		WeatherAPIKey:    loadStrEnv("WEATHER_API_KEY", ""),
+		HomeAssistant: HomeAssistantConfig{
+			Endpoint:          loadStrEnv("HA_ENDPOINT", "http://localhost:8123"),
+			APIKey:            loadStrEnv("HA_API_KEY", ""),
+			OutdoorTempID:     loadStrEnv("HA_OUTDOOR_TEMP_ID", ""),
+			OutdoorHumidityID: loadStrEnv("HA_OUTDOOR_HUMID_ID", ""),
+			IndoorTempID:      loadStrEnv("HA_INDOOR_TEMP_ID", ""),
+			IndoorHumidityID:  loadStrEnv("HA_INDOOR_HUMID_ID", ""),
+		},
 	}
 }
 
