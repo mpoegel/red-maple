@@ -112,3 +112,26 @@ type Description struct {
 	Description string `json:"description"`
 	Icon        string `json:"icon"`
 }
+
+type PollutionData struct {
+	Coordinates struct {
+		Latitude  float64 `json:"lat"`
+		Longitude float64 `json:"lon"`
+	} `json:"coord"`
+	Data []struct {
+		Timestamp int `json:"dt"`
+		Main      struct {
+			AQI int `json:"aqi"`
+		} `json:"main"`
+		Components struct {
+			CarbonMonoxide   float64 `json:"co"`
+			NitrogenMonoxide float64 `json:"no"`
+			NitrogenDioxide  float64 `json:"no2"`
+			Ozone            float64 `json:"o3"`
+			SulfurDioxide    float64 `json:"so2"`
+			Particulates2_5  float64 `json:"pm2_5"`
+			Particulates10   float64 `json:"pm10"`
+			Ammonia          float64 `json:"nh3"`
+		} `json:"components"`
+	} `json:"list"`
+}

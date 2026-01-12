@@ -49,7 +49,7 @@ body {
 }
 
 .grid-cell-level-label {
-    flex-basis: 80%;
+    flex-basis: 90%;
     border: 1px solid black;
 }
 
@@ -74,6 +74,10 @@ body {
     padding-top: 20px;
     font-size: 9px;
     width: 50px;
+}
+
+.humidity .grid-cell-level-label {
+    flex-basis: 80% !important;
 }
 
 .measurement-label {
@@ -113,15 +117,17 @@ red 9E4539
 .train-line {
     font-size: 20px;
     width: 100%;
-    text-wrap-mode: nowrap;
+    white-space: nowrap;
     overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .subway-stop {
     font-size: 12px;
     width: 100%;
-    text-wrap-mode: nowrap;
+    white-space: nowrap;
     overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .next-train {
@@ -135,8 +141,9 @@ red 9E4539
 
 .train-details div {
     width: 100%;
-    text-wrap-mode: nowrap;
+    white-space: nowrap;
     overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .bike-table {
@@ -145,8 +152,9 @@ red 9E4539
 
 .bike-station {
     font-size: 14px;
-    text-wrap-mode: nowrap;
+    white-space: nowrap;
     overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .total-bikes {
@@ -164,7 +172,7 @@ red 9E4539
 }
 
 #sun-symbols {
-    flex-basis: 25%;
+    flex-basis: 15%;
     font-size: 32px;
     text-align: center;
 }
@@ -176,13 +184,44 @@ red 9E4539
 }
 
 #sun-times {
-    flex-basis: 55%;
+    flex-basis: 50%;
     font-size: 32px;
     text-align: center;
 }
 
 .sun-spacer {
     font-size: 2px;
+}
+
+#aqi-table {
+    flex-basis: 25%;
+    font-size: 12px;
+    text-align: center;
+}
+
+.aqi-title {
+    border: none;
+    font-weight: bold;
+}
+
+.aqi-good {
+    background-color: #399E63;
+}
+
+.aqi-fair {
+    background-color: #EDDD53;
+}
+
+.aqi-moderate {
+    background-color: #9E5E39;
+}
+
+.aqi-poor {
+    background-color: #9E4539;
+}
+
+.aqi-very-poor {
+    background-color: #6B251C;
 }
 
 #datetime {

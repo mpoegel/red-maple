@@ -5,18 +5,30 @@
         <div id="sun-symbols" class="inline-grid">
             <div class="grid-cell-1xn"><i class="wi wi-sunrise"></i></div>
             <div class="grid-cell-1xn sun-spacer">&nbsp;</div>
-            <div class="grid-cell-1xn"><i class="wi wi-moon-waning-gibbous-1"></i></div>
+            <div class="grid-cell-1xn"><i class="wi {{.MoonPhaseIcon}}"></i></div>
         </div>
 
-        <div id="sun-city">NYC</div>
-
         <span id="sun-times" class="inline-grid">
-            <div class="grid-cell-1xn">7:16 AM</div>
+            <div class="grid-cell-1xn">{{.SunriseTime}} AM</div>
             <div class="grid-cell-1xn sun-spacer">&nbsp;</div>
-            <div class="grid-cell-1xn">5:03 PM</div>
+            <div class="grid-cell-1xn">{{.SunsetTime}} PM</div>
+        </span>
+
+        <span id="aqi-table" class="inline-grid">
+            <div class="grid-cell-level-indicator">&nbsp;</div>
+            <div class="grid-cell-level-label aqi-title">AQI</div>
+            <div class="grid-cell-level-indicator">{{if eq .AQI 1}}❯{{else}}&nbsp;{{end}}</div>
+            <div class="grid-cell-level-label aqi-good">Good</div>
+            <div class="grid-cell-level-indicator">{{if eq .AQI 2}}❯{{else}}&nbsp;{{end}}</div>
+            <div class="grid-cell-level-label aqi-fair">Fair</div>
+            <div class="grid-cell-level-indicator">{{if eq .AQI 3}}❯{{else}}&nbsp;{{end}}</div>
+            <div class="grid-cell-level-label aqi-moderate">Moderate</div>
+            <div class="grid-cell-level-indicator">{{if eq .AQI 4}}❯{{else}}&nbsp;{{end}}</div>
+            <div class="grid-cell-level-label aqi-poor">Poor</div>
+            <div class="grid-cell-level-indicator">{{if eq .AQI 5}}❯{{else}}&nbsp;{{end}}</div>
+            <div class="grid-cell-level-label aqi-very-poor">Very Poor</div>
         </span>
     </div>
 
 </div>
 {{end}}
-wi-sunrise

@@ -60,3 +60,10 @@ type IndoorPartial struct {
 }
 
 type OutdoorPartial IndoorPartial
+
+type SunrisePartial struct {
+	SunriseTime   string
+	SunsetTime    string
+	AQI           int
+	MoonPhaseIcon string
+}

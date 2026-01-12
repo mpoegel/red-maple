@@ -91,6 +91,7 @@ func (s *Server) LoadRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /x/weather", s.HandleWeather)
 	mux.HandleFunc("GET /x/indoor", s.HandleIndoor)
 	mux.HandleFunc("GET /x/outdoor", s.HandleOutdoor)
+	mux.HandleFunc("GET /x/sunrise", s.HandleSunrise)
 
 	mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.Dir(s.config.StaticDir))))
 
