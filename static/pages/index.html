@@ -11,7 +11,7 @@
         <div class="grid-cell-2xn" hx-get="/x/subway" hx-trigger="load, every 1m"></div>
         <div class="grid-cell-2xn" hx-get="/x/outdoor" hx-trigger="load, every 1m"></div>
         <div class="grid-cell-2xn" hx-get="/x/citibike" hx-trigger="load, every 5m"></div>
-        <div class="grid-cell-2xn" hx-get="/x/sunrise" hx-trigger="load"></div>
+        <div class="grid-cell-2xn" hx-get="/x/sunrise" hx-trigger="load, every 60m"></div>
         <div class="grid-cell-2xn" hx-get="/x/datetime" hx-trigger="load, every 1s"></div>
         <div class="grid-cell-2xn">
             {{template "Navigation"}}
