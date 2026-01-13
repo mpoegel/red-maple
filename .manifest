@@ -1,0 +1,16 @@
+[[bundle]]
+static      /usr/local/etc/red-maple/static
+vendored    /usr/local/etc/red-maple/vendored
+
+extra/default.env         /usr/local/etc/red-maple/default.env
+extra/red-maple.service   /etc/systemd/system/red-maple.service
+
+[[go_build]]
+main.go     /usr/local/bin/red-maple
+
+[[post_install]]
+[[ -f /usr/local/etc/red-maple/.env ]] || cp /usr/local/etc/red-maple/default.env /usr/local/etc/red-maple/.env
+systemctl daemon-reload
+systemctl restart red-maple.service
+systemctl enable red-maple.service
+service red-maple status

@@ -1,0 +1,20 @@
+[Unit]
+Description=red maple
+Wants=network-online.target
+After=network-online.target
+StartLimitIntervalSec=60
+StartLimitBurst=3
+
+[Service]
+User=root
+Group=root
+Type=simple
+Restart=on-failure
+RestartSec=5s
+ExecStart=/usr/local/bin/red-maple
+EnvironmentFile=/usr/local/etc/red-maple/.env
+StandardOutput=append:/var/log/homelab/red-maple.log
+StandardError=append:/var/log/homelab/red-maple.log
+
+[Install]
+WantedBy=multi-user.target
