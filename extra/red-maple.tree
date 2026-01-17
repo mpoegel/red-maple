@@ -1,0 +1,4 @@
+Name                red-maple
+Command             /usr/local/bin/red-maple
+Restart             limited
+RestartAttempts     10
