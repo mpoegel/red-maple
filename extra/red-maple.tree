@@ -1,4 +1,5 @@
 Name                red-maple
 Command             /usr/local/bin/red-maple
+EnvironmentFile     /usr/local/etc/red-maple/.env
 Restart             limited
 RestartAttempts     10
