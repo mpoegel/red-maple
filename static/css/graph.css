@@ -1,0 +1,80 @@
+.graph-half {
+    width: 50%;
+}
+
+.graph-full {
+    width: 100%;
+}
+
+.graph-header {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+
+    span {
+        margin: 0 8px;
+    }
+}
+
+.graph-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    height: 200px;
+    margin: 10px 0;
+}
+
+.graph-y-axis {
+    flex-basis: 6%;
+    flex-direction: column;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    height: 100%;
+    display: inline-flex;
+    padding: 2px;
+    text-align: end;
+    font-size: 12px;
+
+    div {
+        height: 20px;
+    }
+}
+
+.graph-y-min {
+    margin-top: auto;
+}
+
+.graph-area {
+    height: 100%;
+    flex-basis: 90%;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: flex-end;
+    border: 2px solid black;
+    border-bottom: 7px solid black;
+}
+
+.graph-col {
+    display: inline-block;
+    background-color: black;
+}
+
+.graph-cell {
+    height: 20px;
+    font-size: 20px;
+}
+
+.graph-x-axis {
+    padding-left: 7%;
+    padding-right: 2%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.graph-data-selection {
+    text-align: center;
+    margin: 10px 0;
+    height: 20px;
+}
