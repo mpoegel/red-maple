@@ -43,6 +43,10 @@ func (s *Server) HandleCitibike(w http.ResponseWriter, r *http.Request) {
 	s.executeTemplate(w, "Citibike", data)
 }
 
+func (s *Server) HandleBikesFull(w http.ResponseWriter, r *http.Request) {
+	s.executeTemplate(w, "BikesFull", struct{}{})
+}
+
 func loadCitibikeStations(ctx context.Context, client citibike.Client, names []string) ([]string, error) {
 	stationInfo, err := client.GetStationInformation(ctx)
 	if err != nil {

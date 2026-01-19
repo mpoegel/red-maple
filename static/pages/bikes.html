@@ -1,0 +1,91 @@
+{{define "BikesFull"}}
+<!DOCTYPE html>
+<html>
+
+{{template "Head"}}
+
+<body>
+    <div class="grid" id="main-grid">
+        <div class="grid-cell-2xn">
+            <div class="graph-full">
+                <div class="graph-header">
+                    <span>30 DAYS</span>
+                    <span>7 DAYS</span>
+                    <span>[24 HOURS]</span>
+                </div>
+                <div class="graph-top">
+                    <div class="graph-y-axis">
+                        <div class="graph-y-max">50</div>
+                        <div class="graph-y-min">0</div>
+                    </div>
+                    <div class="graph-area">
+                        <span class="graph-col" style="margin-bottom: 10px; height: 100px; width: 10%;">&nbsp;</span>
+                        <span class="graph-col" style="margin-bottom: 20px; height: 80px; width: 10%;">&nbsp;</span>
+                        <span class="graph-col" style="margin-bottom: 30px; height: 70px; width: 10%;">&nbsp;</span>
+                        <span class="graph-col" style="margin-bottom: 15px; height: 100px; width: 10%;">&nbsp;</span>
+                        <span class="graph-col" style="margin-bottom: 22px; height: 60px; width: 10%;">&nbsp;</span>
+                        <span class="graph-col" style="margin-bottom: 3px; height: 60px; width: 10%;">&nbsp;</span>
+                        <span class="graph-col" style="margin-bottom: 0px; height: 130px; width: 10%;">&nbsp;</span>
+                        <span class="graph-col" style="margin-bottom: 49px; height: 140px; width: 10%;">&nbsp;</span>
+                        <span class="graph-col" style="margin-bottom: 64px; height: 120px; width: 10%;">&nbsp;</span>
+                        <span class="graph-col" style="margin-bottom: 10px; height: 150px; width: 10%;">&nbsp;</span>
+                    </div>
+                </div>
+                <div class="graph-bottom">
+                    <div class="graph-x-axis">
+                        <span class="graph-x-min">8AM</span>
+                        <span class="graph-x-max">8AM</span>
+                    </div>
+                    <div class="graph-data-selection">
+                        <span>[Station 1]</span>
+                        <span>Station 2</span>
+                    </div>
+                    <div class="graph-data-selection">
+                        <span>[All]</span>
+                        <span>Classic</span>
+                        <span>Electric</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="grid-cell-2xn">
+            <div class="east-river-bike-map-title">East River Bicycle Crossings</div>
+            <pre class="east-river-bike-map">
+▌       ▌
+▙▄▄▄▄▄▄▄▌    Queensboro Bridge: 12043
+▌       ▌
+▌       ▌
+▌       ▌
+▚       ▚
+ ▚       ▚
+  ▚       ▚
+   ▚       ▚
+    ▚       ▚
+     ▚       ▚
+     ▐       ▐
+     ▐▄▄▄▄▄▄▄▟    Williamsburg Bridge: 10506
+     ▐       ▐
+     ▐       ▐
+     ▐       ▐
+     ▟       ▞
+    ▞▀▜▄    ▞
+   ▞   ▀▀▙▄▟    Manhattan Bridge: 5004
+  ▟▄▄▄    ▞
+ ▞   ▀▙▄▄▟    Brooklyn Bridge: 7506
+▞        ▌
+▌        ▌
+</pre>
+            <div class="east-river-bike-controls">[Daily] Monthly Year-To-Date</div>
+        </div>
+        <div class="grid-cell-2xn" hx-get="/x/datetime" hx-trigger="load, every 1s"></div>
+        <div class="grid-cell-2xn">
+            {{template "Navigation"}}
+        </div>
+    </div>
+</body>
+
+<script src="/static/js/index.js"></script>
+
+</html>
+{{end}}
