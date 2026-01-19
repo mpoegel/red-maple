@@ -15,6 +15,11 @@ body {
     overflow: hidden;
 }
 
+a {
+    text-decoration: none;
+    color: black;
+}
+
 .request-error {
     background-color: #9E4539;
 }

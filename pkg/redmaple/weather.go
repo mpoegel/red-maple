@@ -76,6 +76,10 @@ func (s *Server) HandleSunrise(w http.ResponseWriter, r *http.Request) {
 	s.executeTemplate(w, "Sunrise", partialData)
 }
 
+func (s *Server) HandleWeatherFull(w http.ResponseWriter, r *http.Request) {
+	s.executeTemplate(w, "WeatherFull", struct{}{})
+}
+
 func (s *Server) HandleSunriseFull(w http.ResponseWriter, r *http.Request) {
 	s.executeTemplate(w, "SunriseFull", struct{}{})
 }

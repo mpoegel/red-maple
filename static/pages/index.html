@@ -6,12 +6,24 @@
 
 <body>
     <div class="grid" id="main-grid">
-        <div class="grid-cell-2xn" hx-get="/x/weather" hx-trigger="load, every 10m"></div>
-        <div class="grid-cell-2xn" hx-get="/x/indoor" hx-trigger="load, every 1m"></div>
-        <div class="grid-cell-2xn" hx-get="/x/subway" hx-trigger="load, every 1m"></div>
-        <div class="grid-cell-2xn" hx-get="/x/outdoor" hx-trigger="load, every 1m"></div>
-        <div class="grid-cell-2xn" hx-get="/x/citibike" hx-trigger="load, every 5m"></div>
-        <div class="grid-cell-2xn" hx-get="/x/sunrise" hx-trigger="load, every 60m"></div>
+        <a href="/weather" class="grid-cell-2xn">
+            <div hx-get="/x/weather" hx-trigger="load, every 10m"></div>
+        </a>
+        <a href="/indoor" class="grid-cell-2xn">
+            <div hx-get="/x/indoor" hx-trigger="load, every 1m"></div>
+        </a>
+        <a href="/subway" class="grid-cell-2xn">
+            <div hx-get="/x/subway" hx-trigger="load, every 1m"></div>
+        </a>
+        <a href="/outdoor" class="grid-cell-2xn">
+            <div hx-get="/x/outdoor" hx-trigger="load, every 1m"></div>
+        </a>
+        <a href="/bikes" class="grid-cell-2xn">
+            <div hx-get="/x/citibike" hx-trigger="load, every 5m"></div>
+        </a>
+        <a href="/sunrise" class="grid-cell-2xn">
+            <div hx-get="/x/sunrise" hx-trigger="load, every 60m"></div>
+        </a>
         <div class="grid-cell-2xn" hx-get="/x/datetime" hx-trigger="load, every 1s"></div>
         <div class="grid-cell-2xn">
             {{template "Navigation"}}

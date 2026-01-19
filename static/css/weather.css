@@ -1,0 +1,52 @@
+.weather-cell {
+    height: 345px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.weather-table-today,
+.weather-table-forecast {
+    width: 100%;
+    text-align: center;
+
+    th {
+        font-size: 10px;
+    }
+}
+
+.weather-table-ts {
+    text-align: right;
+}
+
+.weather-alerts {
+    margin-top: 10px;
+}
+
+.weather-alert {
+    margin-bottom: 20px;
+}
+
+.weather-alert-title {
+    text-align: center;
+    width: 100%;
+    font-weight: bold;
+    animation: blink-orange-animation 2s steps(1, start) infinite;
+}
+
+@keyframes blink-orange-animation {
+    50% {
+        color: #9E5E39;
+    }
+}
+
+.weather-alert-ts {
+    width: 100%;
+    text-align: center;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.weather-alert-content {
+    white-space: wrap;
+    font-size: 12px;
+}
