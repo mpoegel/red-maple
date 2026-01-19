@@ -222,7 +222,18 @@ red 9E4539
 }
 
 .aqi-very-poor {
-    background-color: #6B251C;
+    background-color: #4e1154;
+    color: white;
+}
+
+.aqi-hazardous {
+    background-color: #6c190e;
+    color: white;
+}
+
+.aqi-very-hazardous {
+    background-color: #4a210b;
+    color: white;
 }
 
 #datetime {

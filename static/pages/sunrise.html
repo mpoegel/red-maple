@@ -1,0 +1,219 @@
+{{define "SunriseFull"}}
+<!DOCTYPE html>
+<html>
+
+{{template "Head"}}
+
+<body>
+    <div class="grid" id="main-grid">
+        <div class="grid-cell-2xn sunrise-grid-cell">
+            <table class="sunrise-table">
+                <tr>
+                    <th></th>
+                    <th><i class="wi wi-sunrise"></i></th>
+                    <th><i class="wi wi-sunset"></i></th>
+                    <th><i class="wi wi-night-clear"></i></th>
+                    <th><i class="wi wi-hot"></i></th>
+                </tr>
+                <tr>
+                    <td>MON</td>
+                    <td>7:12 AM</td>
+                    <td>4:58 PM</td>
+                    <td><i class="wi wi-moon-waxing-crescent-4"></i></td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td>TUE</td>
+                    <td>7:12 AM</td>
+                    <td>4:58 PM</td>
+                    <td><i class="wi wi-moon-waxing-crescent-4"></i></td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td>WED</td>
+                    <td>7:12 AM</td>
+                    <td>4:58 PM</td>
+                    <td><i class="wi wi-moon-waxing-crescent-4"></i></td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td>THU</td>
+                    <td>7:12 AM</td>
+                    <td>4:58 PM</td>
+                    <td><i class="wi wi-moon-waxing-crescent-4"></i></td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td>FRI</td>
+                    <td>7:12 AM</td>
+                    <td>4:58 PM</td>
+                    <td><i class="wi wi-moon-waxing-crescent-4"></i></td>
+                    <td>1</td>
+                </tr>
+            </table>
+
+            <div class="sundial" style="transform: rotate(0deg);">
+                <div class="sundial-sun" style="background-color: rgb(84, 154, 228);"><i class="wi wi-day-sunny"></i>
+                </div>
+                <div class="sundial-moon" style="background-color: rgb(84, 154, 228);"><i class=" wi wi-night-clear">
+                    </i>
+                </div>
+            </div>
+            <div class="sundial-horizon"></div>
+        </div>
+        <div class="grid-cell-2xn">
+
+            <div class="aqi-full">
+                AQI: 56 (moderate)
+            </div>
+
+            <div class="aqi-meter">
+                <div class="aqi-meter-indicator">
+                    <div class="aqi-meter-label">&nbsp;</div>
+                    <div class="aqi-meter-arrow" style="margin-left:44px">▼</div>
+                </div>
+                <div class="aqi-meter-bar">
+                    <div class="aqi-meter-label">CO</div>
+                    <div class="aqi-meter-level aqi-good">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-fair">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-moderate">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-poor">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-very-poor">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-hazardous">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-very-hazardous">&nbsp;</div>
+                    <div class="aqi-meter-reading">5.2 ppm</div>
+                </div>
+            </div>
+            <div class="aqi-meter">
+                <div class="aqi-meter-indicator">
+                    <div class="aqi-meter-label">&nbsp;</div>
+                    <div class="aqi-meter-arrow" style="margin-left:84px">▼</div>
+                </div>
+                <div class="aqi-meter-bar">
+                    <div class="aqi-meter-label">NO</div>
+                    <div class="aqi-meter-level aqi-good">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-fair">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-moderate">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-poor">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-very-poor">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-hazardous">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-very-hazardous">&nbsp;</div>
+                    <div class="aqi-meter-reading">5.2 ppm</div>
+                </div>
+            </div>
+
+            <div class="aqi-meter">
+                <div class="aqi-meter-indicator">
+                    <div class="aqi-meter-label">&nbsp;</div>
+                    <div class="aqi-meter-arrow" style="margin-left:54px">▼</div>
+                </div>
+                <div class="aqi-meter-bar">
+                    <div class="aqi-meter-label">NO<sub>2</sub></div>
+                    <div class="aqi-meter-level aqi-good">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-fair">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-moderate">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-poor">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-very-poor">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-hazardous">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-very-hazardous">&nbsp;</div>
+                    <div class="aqi-meter-reading">5.2 ppm</div>
+                </div>
+            </div>
+            <div class="aqi-meter">
+                <div class="aqi-meter-indicator">
+                    <div class="aqi-meter-label">&nbsp;</div>
+                    <div class="aqi-meter-arrow" style="margin-left:53px">▼</div>
+                </div>
+                <div class="aqi-meter-bar">
+                    <div class="aqi-meter-label">O<sub>3</sub></div>
+                    <div class="aqi-meter-level aqi-good">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-fair">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-moderate">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-poor">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-very-poor">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-hazardous">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-very-hazardous">&nbsp;</div>
+                    <div class="aqi-meter-reading">5.2 ppm</div>
+                </div>
+            </div>
+            <div class="aqi-meter">
+                <div class="aqi-meter-indicator">
+                    <div class="aqi-meter-label">&nbsp;</div>
+                    <div class="aqi-meter-arrow" style="margin-left:44px">▼</div>
+                </div>
+                <div class="aqi-meter-bar">
+                    <div class="aqi-meter-label">SO<sub>2</sub></div>
+                    <div class="aqi-meter-level aqi-good">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-fair">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-moderate">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-poor">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-very-poor">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-hazardous">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-very-hazardous">&nbsp;</div>
+                    <div class="aqi-meter-reading">5.2 ppm</div>
+                </div>
+            </div>
+            <div class="aqi-meter">
+                <div class="aqi-meter-indicator">
+                    <div class="aqi-meter-label">&nbsp;</div>
+                    <div class="aqi-meter-arrow" style="margin-left:34px">▼</div>
+                </div>
+                <div class="aqi-meter-bar">
+                    <div class="aqi-meter-label">PM<sub>2.5</sub></div>
+                    <div class="aqi-meter-level aqi-good">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-fair">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-moderate">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-poor">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-very-poor">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-hazardous">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-very-hazardous">&nbsp;</div>
+                    <div class="aqi-meter-reading">5.2 ppm</div>
+                </div>
+            </div>
+            <div class="aqi-meter">
+                <div class="aqi-meter-indicator">
+                    <div class="aqi-meter-label">&nbsp;</div>
+                    <div class="aqi-meter-arrow" style="margin-left:14px">▼</div>
+                </div>
+                <div class="aqi-meter-bar">
+                    <div class="aqi-meter-label">PM<sub>10</sub></div>
+                    <div class="aqi-meter-level aqi-good">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-fair">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-moderate">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-poor">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-very-poor">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-hazardous">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-very-hazardous">&nbsp;</div>
+                    <div class="aqi-meter-reading">5.2 ppm</div>
+                </div>
+            </div>
+            <div class="aqi-meter">
+                <div class="aqi-meter-indicator">
+                    <div class="aqi-meter-label">&nbsp;</div>
+                    <div class="aqi-meter-arrow" style="margin-left:22px">▼</div>
+                </div>
+                <div class="aqi-meter-bar">
+                    <div class="aqi-meter-label">NH<sub>3</sub></div>
+                    <div class="aqi-meter-level aqi-good">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-fair">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-moderate">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-poor">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-very-poor">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-hazardous">&nbsp;</div>
+                    <div class="aqi-meter-level aqi-very-hazardous">&nbsp;</div>
+                    <div class="aqi-meter-reading">5.2 ppm</div>
+                </div>
+            </div>
+
+        </div>
+        <div class="grid-cell-2xn" hx-get="/x/datetime" hx-trigger="load, every 1s"></div>
+        <div class="grid-cell-2xn">
+            {{template "Navigation"}}
+        </div>
+    </div>
+</body>
+
+<script src="/static/js/index.js"></script>
+
+</html>
+{{end}}

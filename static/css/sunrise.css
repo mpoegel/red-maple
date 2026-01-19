@@ -1,0 +1,94 @@
+.sunrise-grid-cell {
+    height: 345px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.sunrise-table {
+    width: 100%;
+    text-align: center;
+
+    th {
+        font-size: 26px;
+    }
+}
+
+.sundial {
+    font-size: 48px;
+    margin: auto;
+    margin-top: 30px;
+    width: 150px;
+    height: 150px;
+    text-align: center;
+    z-index: 2;
+}
+
+.sundial-sun {
+    color: yellow;
+    border-top-left-radius: 100px;
+    border-top-right-radius: 100px;
+    width: 150px;
+    height: 75px;
+
+    i {
+        margin-top: 10px;
+    }
+}
+
+.sundial-moon {
+    color: white;
+    border-bottom-left-radius: 100px;
+    border-bottom-right-radius: 100px;
+    width: 150px;
+    height: 75px;
+
+    i {
+        transform: rotate(180deg);
+        margin-bottom: 10px;
+    }
+}
+
+.sundial-horizon {
+    background-color: black;
+    z-index: 1;
+    height: 75px;
+    width: 150px;
+    margin: auto;
+    margin-top: -75px;
+    transform: rotate(0deg);
+    border-bottom-left-radius: 100px;
+    border-bottom-right-radius: 100px;
+}
+
+.aqi-full {
+    text-align: center;
+}
+
+.aqi-meter {
+    margin: 3px 0;
+}
+
+.aqi-meter-bar,
+.aqi-meter-indicator {
+    display: flex;
+}
+
+.aqi-meter-indicator {
+    margin-bottom: -5px;
+}
+
+.aqi-meter-label {
+    margin-right: 7px;
+    width: 40px;
+    text-align: right;
+}
+
+.aqi-meter-level {
+    width: 40px;
+}
+
+.aqi-meter-reading {
+    font-size: 10px;
+    margin-top: 3px;
+    margin-left: 3px;
+}
