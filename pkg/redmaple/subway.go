@@ -60,6 +60,10 @@ func (s *Server) HandleSubway(w http.ResponseWriter, r *http.Request) {
 	s.executeTemplate(w, "Subway", data)
 }
 
+func (s *Server) HandleSubwayFull(w http.ResponseWriter, r *http.Request) {
+	s.executeTemplate(w, "SubwayFull", struct{}{})
+}
+
 func minutesUntilArrival(arrival int64, tz *time.Location) int {
 	return int(time.Until(time.Unix(arrival, 0).In(tz)).Minutes())
 }

@@ -1,0 +1,64 @@
+.subway {
+    display: flex;
+    height: 220px;
+}
+
+.subway-segment {
+    display: flex;
+    flex-direction: column;
+    width: 15px;
+}
+
+.subway-station-label {
+    writing-mode: vertical-lr;
+}
+
+.subway-track {
+    font-size: 24px;
+    text-align: center;
+}
+
+.has-train {
+    animation: blink-green-animation 1s steps(1, start) infinite;
+}
+
+@keyframes blink-green-animation {
+    50% {
+        color: #399E63;
+    }
+}
+
+.no-service-station {
+    color: #9E5E39;
+}
+
+.subway-back,
+.subway-next {
+    font-size: 36px;
+    flex-basis: 5%;
+    margin-top: 10px;
+}
+
+.subway-back {
+    margin-right: 10px;
+}
+
+.subway-next {
+    margin-left: 10px;
+}
+
+.subway-status {
+    height: 50px;
+    padding: 10px;
+    flex-basis: 88%;
+}
+
+.subway-selection {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 24px;
+}
+
+.has-disruption {
+    color: #9E5E39;
+}
