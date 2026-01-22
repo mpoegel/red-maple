@@ -4,6 +4,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type Config struct {
@@ -16,6 +17,8 @@ type Config struct {
 	WeatherLocation  string
 	WeatherAPIKey    string
 	HomeAssistant    HomeAssistantConfig
+	ExportInterval   time.Duration
+	InfluxDB         InfluxDBConfig
 }
 
 type HomeAssistantConfig struct {
@@ -25,6 +28,13 @@ type HomeAssistantConfig struct {
 	OutdoorHumidityID string
 	IndoorTempID      string
 	IndoorHumidityID  string
+}
+
+type InfluxDBConfig struct {
+	Enabled  bool
+	Endpoint string
+	Token    string
+	Database string
 }
 
 func LoadConfig() Config {
@@ -44,6 +54,13 @@ func LoadConfig() Config {
 			OutdoorHumidityID: loadStrEnv("HA_OUTDOOR_HUMID_ID", ""),
 			IndoorTempID:      loadStrEnv("HA_INDOOR_TEMP_ID", ""),
 			IndoorHumidityID:  loadStrEnv("HA_INDOOR_HUMID_ID", ""),
+		},
+		ExportInterval: loadDurationEnv("EXPORT_INTERVAL", 1*time.Minute),
+		InfluxDB: InfluxDBConfig{
+			Enabled:  loadBoolEnv("INFLUXDB_ENABLED", false),
+			Endpoint: loadStrEnv("INFLUXDB_ENDPOINT", ""),
+			Token:    loadStrEnv("INFLUXDB_TOKEN", ""),
+			Database: loadStrEnv("INFLUXDB_DATABASE", ""),
 		},
 	}
 }
@@ -70,6 +87,18 @@ func loadIntEnv(name string, defaultVal int) int {
 		return defaultVal
 	}
 	val, err := strconv.Atoi(valStr)
+	if err != nil {
+		return defaultVal
+	}
+	return val
+}
+
+func loadDurationEnv(name string, defaultVal time.Duration) time.Duration {
+	valStr, ok := os.LookupEnv(name)
+	if !ok {
+		return defaultVal
+	}
+	val, err := time.ParseDuration(valStr)
 	if err != nil {
 		return defaultVal
 	}

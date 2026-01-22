@@ -6,11 +6,15 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"time"
+
+	api "github.com/mpoegel/red-maple/pkg/api"
 )
 
 type Client interface {
 	GetDeviceState(ctx context.Context, deviceID string) (*DeviceState, error)
 	DeviceCache(deviceID string) *DeviceState
+	GetProvider(deviceIDs ...string) api.ProviderFunc
 }
 
 type ClientImpl struct {
@@ -60,4 +64,26 @@ func (c *ClientImpl) GetDeviceState(ctx context.Context, deviceID string) (*Devi
 
 func (c *ClientImpl) DeviceCache(deviceID string) *DeviceState {
 	return c.cache[deviceID]
+}
+
+func (c *ClientImpl) GetProvider(deviceIDs ...string) api.ProviderFunc {
+	return func(ctx context.Context) (*api.DataPoint, error) {
+		data := &api.DataPoint{
+			Table: "home-assistant",
+			Tags: map[api.DataTag]string{
+				api.LocationTag: "home",
+			},
+			Fields: map[string]any{},
+			Stamp:  time.Now(),
+		}
+		for _, deviceID := range deviceIDs {
+			state, err := c.GetDeviceState(ctx, deviceID)
+			if err != nil {
+				slog.Warn("failed to capture device state", "deviceID", deviceID, "err", err)
+				continue
+			}
+			data.Fields[state.Attributes.FriendlyName] = state.State
+		}
+		return data, nil
+	}
 }

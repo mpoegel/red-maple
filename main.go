@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
+	"syscall"
 	"time"
 
 	redmaple "github.com/mpoegel/red-maple/pkg/redmaple"
@@ -18,7 +19,8 @@ func main() {
 
 func run() error {
 	slog.SetLogLoggerLevel(slog.LevelDebug)
-	ctx := context.Background()
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer cancel()
 
 	config := redmaple.LoadConfig()
 
@@ -28,15 +30,13 @@ func run() error {
 		return err
 	}
 
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
 	go func() {
-		<-c
+		<-ctx.Done()
 		slog.Info("shutting down")
 		ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 		defer cancel()
 		server.Stop(ctx)
 	}()
 
-	return server.Start()
+	return server.Start(ctx)
 }

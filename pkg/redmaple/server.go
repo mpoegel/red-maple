@@ -10,6 +10,7 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	api "github.com/mpoegel/red-maple/pkg/api"
@@ -23,6 +24,7 @@ type Server struct {
 	s      http.Server
 	config Config
 	tz     *time.Location
+	wg     sync.WaitGroup
 
 	citibikeStations []string
 	citibike         citibike.Client
@@ -30,6 +32,8 @@ type Server struct {
 	subwayCli  subway.Client
 	weatherCli weather.Client
 	haClient   ha.Client
+
+	exportHub *ExportHub
 }
 
 func NewServer(config Config) (*Server, error) {
@@ -64,11 +68,26 @@ func NewServer(config Config) (*Server, error) {
 		},
 		config:     config,
 		tz:         tz,
+		wg:         sync.WaitGroup{},
 		citibike:   citibike.NewCachedClient(),
 		subwayCli:  subwayCli,
 		weatherCli: weather.NewClient(weatherLat, weatherLon, config.WeatherAPIKey),
 		haClient:   ha.NewClient(config.HomeAssistant.Endpoint, config.HomeAssistant.APIKey),
+		exportHub:  NewExportHub(config.ExportInterval),
 	}
+
+	if config.InfluxDB.Enabled {
+		client, err := NewInfluxDBExporter(&config.InfluxDB)
+		if err != nil {
+			return nil, err
+		}
+		s.exportHub.AddExporter(client)
+	}
+	s.exportHub.AddProvider(s.haClient.GetProvider(
+		s.config.HomeAssistant.IndoorTempID,
+		s.config.HomeAssistant.IndoorHumidityID,
+		s.config.HomeAssistant.OutdoorTempID,
+		s.config.HomeAssistant.OutdoorHumidityID))
 
 	stationNames := strings.Split(config.CitibikeStations, ",")
 	stations, err := loadCitibikeStations(context.TODO(), s.citibike, stationNames)
@@ -105,13 +124,20 @@ func (s *Server) LoadRoutes(mux *http.ServeMux) {
 	mux.Handle("GET /vendor/weather-icons/", http.StripPrefix("/vendor/weather-icons/", http.FileServer(http.Dir(s.config.VendorDir+"/weather-icons"))))
 }
 
-func (s *Server) Start() error {
+func (s *Server) Start(ctx context.Context) error {
+	// start the export hub
+	s.wg.Go(func() {
+		s.exportHub.Run(ctx)
+	})
+
 	// start the HTTP server
 	slog.Debug("listening", "addr", s.s.Addr)
 	if err := s.s.ListenAndServe(); err != http.ErrServerClosed {
 		slog.Error("http listen error", "error", err)
 		return err
 	}
+
+	s.wg.Wait()
 	return nil
 }
 
