@@ -67,3 +67,8 @@ type SunrisePartial struct {
 	AQI           int
 	MoonPhaseIcon string
 }
+
+type SundialPartial struct {
+	Rotation float64
+	Color    string
+}

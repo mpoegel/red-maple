@@ -52,13 +52,7 @@
                 </tr>
             </table>
 
-            <div class="sundial" style="transform: rotate(0deg);">
-                <div class="sundial-sun" style="background-color: rgb(84, 154, 228);"><i class="wi wi-day-sunny"></i>
-                </div>
-                <div class="sundial-moon" style="background-color: rgb(84, 154, 228);"><i class=" wi wi-night-clear">
-                    </i>
-                </div>
-            </div>
+            <div hx-get="/x/sundial" hx-trigger="load, every 1m"></div>
             <div class="sundial-horizon"></div>
         </div>
         <div class="grid-cell-2xn">

@@ -84,6 +84,52 @@ func (s *Server) HandleSunriseFull(w http.ResponseWriter, r *http.Request) {
 	s.executeTemplate(w, "SunriseFull", struct{}{})
 }
 
+func (s *Server) HandleSundial(w http.ResponseWriter, r *http.Request) {
+	weatherData, err := s.weatherCli.GetWeather(r.Context())
+	if err != nil {
+		slog.Error("failed to get weather data", "err", err)
+		w.WriteHeader(http.StatusServiceUnavailable)
+		return
+	}
+
+	sunrise := time.Unix(int64(weatherData.Current.Sunrise), 0)
+	sunset := time.Unix(int64(weatherData.Current.Sunset), 0)
+	tomorrowSunrise := time.Unix(int64(weatherData.Daily[1].Sunrise), 0)
+	// estimate yesterday's sunset
+	yesterdaySunset := sunset.AddDate(0, 0, -1)
+	now := time.Now()
+
+	data := api.SundialPartial{}
+	if now.After(sunrise) && now.Before(sunset) {
+		// sun is up
+		// progress / daylight = x / 180
+		// x = 180 * progress / daylight
+		daylight := sunset.Sub(sunrise).Seconds()
+		data.Rotation = 180.0 * now.Sub(sunrise).Seconds() / daylight
+		data.Color = "#00C6FF"
+	} else if now.After(sunset) && now.Hour() >= sunset.Hour() {
+		// sun has set, same day
+		moonlight := tomorrowSunrise.Sub(sunset).Seconds()
+		data.Rotation = (180.0 * now.Sub(sunset).Seconds() / moonlight) + 180
+		data.Color = "#303030"
+	} else {
+		// sun has not yet risen, next day
+		moonlight := sunrise.Sub(yesterdaySunset).Seconds()
+		data.Rotation = (180.0 * now.Sub(yesterdaySunset).Seconds() / moonlight) + 180
+		data.Color = "#303030"
+	}
+	// midday is 0 deg, so offset by -90def
+	data.Rotation -= 90.0
+
+	if data.Rotation >= 85 && data.Rotation < 90 {
+		data.Color = "#FF5A36"
+	} else if data.Rotation >= 265 && data.Rotation < 270 {
+		data.Color = "#FF5A36"
+	}
+
+	s.executeTemplate(w, "Sundial", data)
+}
+
 func moonPhaseToIcon(i int) string {
 	switch i % 28 {
 	default:
