@@ -15,9 +15,79 @@
         <div class="grid-cell-1xn">{{.DayOfWeek}} <i class="wi wi-owm-{{.WeatherIcon}}"></i> {{.RainChance}}%
             ↗{{.HighTemp}} ↘{{.LowTemp}}</div>
         {{end}}
-        <!-- <div class="grid-cell-1xn">TUE <i class="wi wi-day-sunny"></i> 0% ↗21 ↘9 </div> -->
-        <!-- <div class="grid-cell-1xn">WED <i class="wi wi-day-sunny"></i> 10% ↗20 ↘13 </div> -->
     </span>
 
+</div>
+{{end}}
+
+{{define "FullForecast"}}
+<div class="grid-cell-2xn weather-cell">
+    <table class="weather-table-today">
+        <tr>
+            <th></th>
+            <th></th>
+            <th>Temp.</th>
+            <th>Humidity</th>
+            <th>Wind</th>
+            <th>Rain Prop.</th>
+            <th>Rain Total</th>
+        </tr>
+        {{ range .Hourly }}
+        <tr>
+            <td class="weather-table-ts">{{.Stamp}}</td>
+            <td><i class="wi wi-owm-{{.Icon}}"></i></td>
+            <td>{{.Temperature}}°F</td>
+            <td>{{.Humidity}}%</td>
+            <td>{{.WindSpeed}}mph</td>
+            <td>{{.RainChance}}%</td>
+            {{if len .TotalRain}}
+            <td>{{.TotalRain}}in <i class="wi {{.RainOrSnowIcon}}"></i></td>
+            {{else}}
+            <td>-</td>
+            {{end}}
+        </tr>
+        {{end}}
+    </table>
+</div>
+<div class="grid-cell-2xn weather-cell">
+    <table class="weather-table-forecast">
+        <tr>
+            <th></th>
+            <th></th>
+            <th>High</th>
+            <th>Low</th>
+            <th>Humidity</th>
+            <th>Rain Prop.</th>
+            <th>Rain Total</th>
+        </tr>
+        {{range .Daily}}
+        <tr>
+            <td>{{.DayOfWeek}}</td>
+            <td><i class="wi wi-owm-{{.Icon}}"></i></td>
+            <td>{{.HighTemp}}°F</td>
+            <td>{{.LowTemp}}°F</td>
+            <td>{{.Humidity}}%</td>
+            <td>{{.RainChance}}%</td>
+            {{if len .TotalRain}}
+            <td>{{.TotalRain}}in <i class="wi {{.RainOrSnowIcon}}"></i></td>
+            {{else}}
+            <td>-</td>
+            {{end}}
+        </tr>
+        {{end}}
+    </table>
+
+    <div class="weather-alerts">
+        {{range .Alerts}}
+        <div class="weather-alert">
+            <div class="weather-alert-title">{{.Title}}</div>
+            <!-- <div class="weather-alert-ts">JAN 19 8AM to JAN 20 8AM</div> -->
+            <div class="weather-alert-ts">{{.Stamp}}</div>
+            <div class="weather-alert-content">{{.Description}}</div>
+        </div>
+        {{else}}
+        <p>No weather alerts.</p>
+        {{end}}
+    </div>
 </div>
 {{end}}

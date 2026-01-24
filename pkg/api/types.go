@@ -72,3 +72,37 @@ type SundialPartial struct {
 	Rotation float64
 	Color    string
 }
+
+type WeatherFull struct {
+	Hourly []HourlyWeather
+	Daily  []DailyWeather
+	Alerts []WeatherAlert
+}
+
+type HourlyWeather struct {
+	Stamp          string
+	Icon           int
+	Temperature    int
+	Humidity       int
+	WindSpeed      int
+	RainChance     int
+	TotalRain      string
+	RainOrSnowIcon string
+}
+
+type DailyWeather struct {
+	DayOfWeek      string
+	Icon           int
+	HighTemp       int
+	LowTemp        int
+	Humidity       int
+	RainChance     int
+	TotalRain      string
+	RainOrSnowIcon string
+}
+
+type WeatherAlert struct {
+	Title       string
+	Stamp       string
+	Description string
+}

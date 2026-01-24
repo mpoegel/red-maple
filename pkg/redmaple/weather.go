@@ -10,6 +10,10 @@ import (
 	api "github.com/mpoegel/red-maple/pkg/api"
 )
 
+const (
+	CentimetersToInches = 0.393701
+)
+
 func (s *Server) HandleWeather(w http.ResponseWriter, r *http.Request) {
 	weatherData, err := s.weatherCli.GetWeather(r.Context())
 	if err != nil {
@@ -128,6 +132,104 @@ func (s *Server) HandleSundial(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.executeTemplate(w, "Sundial", data)
+}
+
+func (s *Server) HandleForecastFull(w http.ResponseWriter, r *http.Request) {
+	weatherData, err := s.weatherCli.GetWeather(r.Context())
+	if err != nil {
+		slog.Error("failed to get weather data", "err", err)
+		w.WriteHeader(http.StatusServiceUnavailable)
+		return
+	}
+
+	data := api.WeatherFull{
+		Hourly: []api.HourlyWeather{},
+		Daily:  []api.DailyWeather{},
+		Alerts: []api.WeatherAlert{},
+	}
+
+	for i, hour := range weatherData.Hourly {
+		hourData := api.HourlyWeather{
+			Stamp:       "",
+			Icon:        hour.Description[0].ID,
+			Temperature: int(hour.Temperature),
+			Humidity:    hour.Humidity,
+			WindSpeed:   int(hour.WindSpeed),
+			RainChance:  int(hour.ProbabilityOfPrecipitation * 100),
+		}
+		t := time.Unix(int64(hour.Timestamp), 0).In(s.tz)
+		if t.Hour() < 12 {
+			hourData.Stamp = fmt.Sprintf("%d AM", t.Hour())
+		} else {
+			hourData.Stamp = fmt.Sprintf("%d PM", t.Hour()%13)
+		}
+		if hour.Rain.MillimetersPerHour > 0 {
+			hourData.TotalRain = fmt.Sprintf("%.1f", hour.Rain.MillimetersPerHour*CentimetersToInches)
+			hourData.RainOrSnowIcon = "wi-rain"
+		} else if hour.Snow.MillimetersPerHour > 0 {
+			hourData.TotalRain = fmt.Sprintf("%.1f", hour.Snow.MillimetersPerHour*CentimetersToInches)
+			hourData.RainOrSnowIcon = "wi-snow"
+		}
+		if hour.Rain.MillimetersPerHour > 0 && hour.Snow.MillimetersPerHour > 0 {
+			hourData.RainOrSnowIcon = "wi-rain-mix"
+		}
+		data.Hourly = append(data.Hourly, hourData)
+		if i >= 12 {
+			break
+		}
+	}
+
+	for i, day := range weatherData.Daily {
+		t := time.Unix(int64(day.Timestamp), 0).In(s.tz)
+		dayData := api.DailyWeather{
+			DayOfWeek:  strings.ToUpper(t.Weekday().String())[:3],
+			Icon:       day.Description[0].ID,
+			HighTemp:   int(day.Temperature.Max),
+			LowTemp:    int(day.Temperature.Min),
+			Humidity:   day.Humidity,
+			RainChance: int(day.ProbabilityOfPrecipitation * 100),
+		}
+		if day.Rain > 0 {
+			dayData.TotalRain = fmt.Sprintf("%.1f", day.Rain*CentimetersToInches)
+			dayData.RainOrSnowIcon = "wi-rain"
+		} else if day.Snow > 0 {
+			dayData.TotalRain = fmt.Sprintf("%.1f", day.Snow*CentimetersToInches)
+			dayData.RainOrSnowIcon = "wi-snow"
+		}
+		if day.Rain > 0 && day.Snow > 0 {
+			dayData.RainOrSnowIcon = "wi-rain-mix"
+		}
+		data.Daily = append(data.Daily, dayData)
+		if i >= 5 {
+			break
+		}
+	}
+
+	for _, alert := range weatherData.Alerts {
+		start := time.Unix(int64(alert.Start), 0).In(s.tz)
+		end := time.Unix(int64(alert.End), 0).In(s.tz)
+		data.Alerts = append(data.Alerts, api.WeatherAlert{
+			Title: alert.Event,
+			Stamp: fmt.Sprintf("%s %d %s to %s %d %s",
+				strings.ToUpper(start.Month().String()[:3]),
+				start.Day(),
+				hourStamp(start),
+				strings.ToUpper(end.Month().String()[:3]),
+				end.Day(),
+				hourStamp(end),
+			),
+			Description: alert.Description,
+		})
+	}
+
+	s.executeTemplate(w, "FullForecast", data)
+}
+
+func hourStamp(t time.Time) string {
+	if t.Hour() < 12 {
+		return fmt.Sprintf("%d AM", t.Hour())
+	}
+	return fmt.Sprintf("%d PM", t.Hour()%13)
 }
 
 func moonPhaseToIcon(i int) string {
