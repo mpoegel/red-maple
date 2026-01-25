@@ -118,3 +118,15 @@ type AqiPartial struct {
 	Particulates10   int
 	Ammonia          int
 }
+
+type SunriseForecast struct {
+	Forecast []SunForecast
+}
+
+type SunForecast struct {
+	DayOfWeek string
+	Sunrise   string
+	Sunset    string
+	MoonIcon  string
+	UVIndex   int
+}

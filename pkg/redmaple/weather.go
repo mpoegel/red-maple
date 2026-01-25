@@ -261,6 +261,33 @@ func (s *Server) HandleAqiPartial(w http.ResponseWriter, r *http.Request) {
 	s.executeTemplate(w, "AQI", data)
 }
 
+func (s *Server) HandleSunrises(w http.ResponseWriter, r *http.Request) {
+	weatherData, err := s.weatherCli.GetWeather(r.Context())
+	if err != nil {
+		slog.Error("failed to get weather data", "err", err)
+		w.WriteHeader(http.StatusServiceUnavailable)
+		return
+	}
+	data := api.SunriseForecast{
+		Forecast: []api.SunForecast{},
+	}
+	for i, day := range weatherData.Daily {
+		sunrise := time.Unix(int64(day.Sunrise), 0).In(s.tz)
+		sunset := time.Unix(int64(day.Sunset), 0).In(s.tz)
+		data.Forecast = append(data.Forecast, api.SunForecast{
+			DayOfWeek: strings.ToUpper(sunrise.Weekday().String())[:3],
+			Sunrise:   fmt.Sprintf("%d:%02d", sunrise.Hour(), sunrise.Minute()),
+			Sunset:    fmt.Sprintf("%d:%02d", sunset.Hour(), sunset.Minute()),
+			MoonIcon:  moonPhaseToIcon(int(day.MoonPhase * 28)),
+			UVIndex:   int(math.Round(day.UVIndex)),
+		})
+		if i >= 4 {
+			break
+		}
+	}
+	s.executeTemplate(w, "SunriseForecast", data)
+}
+
 var (
 	// https://document.airnow.gov/technical-assistance-document-for-the-reporting-of-daily-air-quailty.pdf
 	aqi_breakpoints      = []float64{0.0, 50, 51, 100, 101, 150, 151, 200, 201, 300, 301}

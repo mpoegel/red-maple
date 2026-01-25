@@ -7,51 +7,7 @@
 <body>
     <div class="grid" id="main-grid">
         <div class="grid-cell-2xn sunrise-grid-cell">
-            <table class="sunrise-table">
-                <tr>
-                    <th></th>
-                    <th><i class="wi wi-sunrise"></i></th>
-                    <th><i class="wi wi-sunset"></i></th>
-                    <th><i class="wi wi-night-clear"></i></th>
-                    <th><i class="wi wi-hot"></i></th>
-                </tr>
-                <tr>
-                    <td>MON</td>
-                    <td>7:12 AM</td>
-                    <td>4:58 PM</td>
-                    <td><i class="wi wi-moon-waxing-crescent-4"></i></td>
-                    <td>1</td>
-                </tr>
-                <tr>
-                    <td>TUE</td>
-                    <td>7:12 AM</td>
-                    <td>4:58 PM</td>
-                    <td><i class="wi wi-moon-waxing-crescent-4"></i></td>
-                    <td>1</td>
-                </tr>
-                <tr>
-                    <td>WED</td>
-                    <td>7:12 AM</td>
-                    <td>4:58 PM</td>
-                    <td><i class="wi wi-moon-waxing-crescent-4"></i></td>
-                    <td>1</td>
-                </tr>
-                <tr>
-                    <td>THU</td>
-                    <td>7:12 AM</td>
-                    <td>4:58 PM</td>
-                    <td><i class="wi wi-moon-waxing-crescent-4"></i></td>
-                    <td>1</td>
-                </tr>
-                <tr>
-                    <td>FRI</td>
-                    <td>7:12 AM</td>
-                    <td>4:58 PM</td>
-                    <td><i class="wi wi-moon-waxing-crescent-4"></i></td>
-                    <td>1</td>
-                </tr>
-            </table>
-
+            <div hx-get="/x/sunrises" hx-trigger="load, every 10m"></div>
             <div hx-get="/x/sundial" hx-trigger="load, every 1m"></div>
             <div class="sundial-horizon"></div>
         </div>

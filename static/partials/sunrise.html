@@ -1,6 +1,5 @@
 {{define "Sunrise"}}
 <div>
-
     <div id="sun-table">
         <div id="sun-symbols" class="inline-grid">
             <div class="grid-cell-1xn"><i class="wi wi-sunrise"></i></div>
@@ -29,6 +28,26 @@
             <div class="grid-cell-level-label aqi-very-unhealthy">Hazardous</div>
         </span>
     </div>
-
 </div>
+{{end}}
+
+{{define "SunriseForecast"}}
+<table class="sunrise-table">
+    <tr>
+        <th></th>
+        <th><i class="wi wi-sunrise"></i></th>
+        <th><i class="wi wi-sunset"></i></th>
+        <th><i class="wi wi-night-clear"></i></th>
+        <th><i class="wi wi-hot"></i></th>
+    </tr>
+    {{range .Forecast}}
+    <tr>
+        <td>{{.DayOfWeek}}</td>
+        <td>{{.Sunrise}}</td>
+        <td>{{.Sunset}}</td>
+        <td><i class="wi {{.MoonIcon}}"></i></td>
+        <td>{{.UVIndex}}</td>
+    </tr>
+    {{end}}
+</table>
 {{end}}
