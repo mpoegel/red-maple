@@ -3,6 +3,7 @@ package redmaple
 import (
 	"fmt"
 	"log/slog"
+	"math"
 	"net/http"
 	"strings"
 	"time"
@@ -223,6 +224,67 @@ func (s *Server) HandleForecastFull(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.executeTemplate(w, "FullForecast", data)
+}
+
+func (s *Server) HandleAqiPartial(w http.ResponseWriter, r *http.Request) {
+	pollutionData, err := s.weatherCli.GetPollution(r.Context())
+	if err != nil {
+		slog.Error("failed to get weather data", "err", err)
+		w.WriteHeader(http.StatusServiceUnavailable)
+		return
+	}
+	co := pollutionData.Data[0].Components.CarbonMonoxide
+	no2 := pollutionData.Data[0].Components.NitrogenDioxide
+	o3 := pollutionData.Data[0].Components.Ozone
+	so2 := pollutionData.Data[0].Components.SulfurDioxide
+	pm25 := pollutionData.Data[0].Components.Particulates2_5
+	pm10 := pollutionData.Data[0].Components.Particulates10
+
+	data := api.AqiPartial{
+		CarbonMonoxide:  calculate_aqi(co/1.15/1000, co_con_breakpoints),
+		Ozone:           calculate_aqi(o3/1.96/1000, o3_con_breakpoints),
+		Particulates2_5: calculate_aqi(pm25, pm25_con_breakpoints),
+		Particulates10:  calculate_aqi(pm10, pm10_con_breakpoints),
+		SulfurDioxide:   calculate_aqi(so2/2.62, so2_con_breakpoints),
+		NitrogenDioxide: calculate_aqi(no2/1.88, no2_con_breakpoints),
+	}
+	data.AQI = max(
+		data.CarbonMonoxide,
+		data.Ozone,
+		data.Particulates2_5,
+		data.Particulates10,
+		data.SulfurDioxide,
+		data.NitrogenDioxide,
+	)
+
+	slog.Info("pollution", "data", data, "raw", pollutionData.Data[0].Components)
+	s.executeTemplate(w, "AQI", data)
+}
+
+var (
+	// https://document.airnow.gov/technical-assistance-document-for-the-reporting-of-daily-air-quailty.pdf
+	aqi_breakpoints      = []float64{0.0, 50, 51, 100, 101, 150, 151, 200, 201, 300, 301}
+	o3_con_breakpoints   = []float64{0.0, 0.054, 0.055, 0.070, 0.071, 0.085, 0.086, 0.105, 0.106, 0.200, 0.201}
+	pm25_con_breakpoints = []float64{0.0, 9.0, 9.1, 35.4, 35.5, 55.4, 55.5, 125.4, 125.5, 225.4, 225.5}
+	pm10_con_breakpoints = []float64{0.0, 54, 55, 154, 155, 254, 255, 354, 355, 424, 425}
+	co_con_breakpoints   = []float64{0.0, 4.4, 4.5, 9.4, 9.5, 12.4, 12.5, 15.4, 15.5, 30.4, 30.5}
+	so2_con_breakpoints  = []float64{0.0, 35, 36, 75, 76, 185, 186, 304, 305, 604, 605}
+	no2_con_breakpoints  = []float64{0.0, 53, 54, 100, 101, 360, 361, 649, 650, 1249, 1250}
+)
+
+func calculate_aqi(concentration float64, con_breakpoints []float64) int {
+	i := 1
+	for i < len(con_breakpoints)-1 {
+		if concentration < con_breakpoints[i] {
+			aqi := (aqi_breakpoints[i]-aqi_breakpoints[i-1])/
+				(con_breakpoints[i]-con_breakpoints[i-1])*
+				(concentration-con_breakpoints[i-1]) +
+				aqi_breakpoints[i-1]
+			return int(math.Round(aqi))
+		}
+		i += 2
+	}
+	return 0
 }
 
 func hourStamp(t time.Time) string {

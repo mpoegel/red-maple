@@ -1,0 +1,94 @@
+{{define "AQI"}}
+<div class="aqi-full">
+    AQI: {{.AQI}} -
+    {{if le .AQI 50}}Good
+    {{else if le .AQI 100}}Moderate
+    {{else if le .AQI 150}}Poor
+    {{else if le .AQI 200}}Unhealthy
+    {{else if le .AQI 300}}Very Unhealthy
+    {{else}}Hazardous
+    {{end}}
+</div>
+
+<div class="aqi-meter">
+    <div class="aqi-meter-indicator">
+        {{template "AQIIndicator" .CarbonMonoxide}}
+    </div>
+    <div class="aqi-meter-bar">
+        <div class="aqi-meter-label">CO</div>
+        {{template "AQILevels"}}
+        <div class="aqi-meter-reading">{{.CarbonMonoxide}}</div>
+    </div>
+</div>
+
+<div class="aqi-meter">
+    <div class="aqi-meter-indicator">
+        {{template "AQIIndicator" .NitrogenDioxide}}
+    </div>
+    <div class="aqi-meter-bar">
+        <div class="aqi-meter-label">NO<sub>2</sub></div>
+        {{template "AQILevels"}}
+        <div class="aqi-meter-reading">{{.NitrogenDioxide}}</div>
+    </div>
+</div>
+<div class="aqi-meter">
+    <div class="aqi-meter-indicator">
+        {{template "AQIIndicator" .Ozone}}
+    </div>
+    <div class="aqi-meter-bar">
+        <div class="aqi-meter-label">O<sub>3</sub></div>
+        {{template "AQILevels"}}
+        <div class="aqi-meter-reading">{{.Ozone}}</div>
+    </div>
+</div>
+<div class="aqi-meter">
+    <div class="aqi-meter-indicator">
+        {{template "AQIIndicator" .SulfurDioxide}}
+    </div>
+    <div class="aqi-meter-bar">
+        <div class="aqi-meter-label">SO<sub>2</sub></div>
+        {{template "AQILevels"}}
+        <div class="aqi-meter-reading">{{.SulfurDioxide}}</div>
+    </div>
+</div>
+<div class="aqi-meter">
+    <div class="aqi-meter-indicator">
+        {{template "AQIIndicator" .Particulates2_5}}
+    </div>
+    <div class="aqi-meter-bar">
+        <div class="aqi-meter-label">PM<sub>2.5</sub></div>
+        {{template "AQILevels"}}
+        <div class="aqi-meter-reading">{{.Particulates2_5}}</div>
+    </div>
+</div>
+<div class="aqi-meter">
+    <div class="aqi-meter-indicator">
+        {{template "AQIIndicator" .Particulates10}}
+    </div>
+    <div class="aqi-meter-bar">
+        <div class="aqi-meter-label">PM<sub>10</sub></div>
+        {{template "AQILevels"}}
+        <div class="aqi-meter-reading">{{.Particulates10}}</div>
+    </div>
+</div>
+{{end}}
+
+{{define "AQIIndicator"}}
+<div class="aqi-meter-label">&nbsp;</div>
+{{if le . 200}}
+<div class="aqi-meter-arrow" style="margin-left:calc({{.}}px - 5px)">▼</div>
+{{else if le . 400}}
+<div class="aqi-meter-arrow" style="margin-left:calc(calc({{.}}px * .5) + 95px)">▼</div>
+{{else}}
+<div class="aqi-meter-arrow" style="margin-left:295px">▼</div>
+{{end}}
+{{end}}
+
+{{define "AQILevels"}}
+<div class="aqi-meter-level aqi-good">&nbsp;</div>
+<div class="aqi-meter-level aqi-moderate">&nbsp;</div>
+<div class="aqi-meter-level aqi-poor">&nbsp;</div>
+<div class="aqi-meter-level aqi-unhealthy">&nbsp;</div>
+<div class="aqi-meter-level aqi-very-unhealthy">&nbsp;</div>
+<div class="aqi-meter-level aqi-hazardous">&nbsp;</div>
+{{end}}

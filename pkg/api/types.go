@@ -106,3 +106,15 @@ type WeatherAlert struct {
 	Stamp       string
 	Description string
 }
+
+type AqiPartial struct {
+	AQI              int
+	CarbonMonoxide   int
+	NitrogenMonoxide int
+	NitrogenDioxide  int
+	Ozone            int
+	SulfurDioxide    int
+	Particulates2_5  int
+	Particulates10   int
+	Ammonia          int
+}

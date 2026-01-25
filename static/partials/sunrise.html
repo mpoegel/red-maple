@@ -20,13 +20,13 @@
             <div class="grid-cell-level-indicator">{{if eq .AQI 1}}❯{{else}}&nbsp;{{end}}</div>
             <div class="grid-cell-level-label aqi-good">Good</div>
             <div class="grid-cell-level-indicator">{{if eq .AQI 2}}❯{{else}}&nbsp;{{end}}</div>
-            <div class="grid-cell-level-label aqi-fair">Fair</div>
-            <div class="grid-cell-level-indicator">{{if eq .AQI 3}}❯{{else}}&nbsp;{{end}}</div>
             <div class="grid-cell-level-label aqi-moderate">Moderate</div>
-            <div class="grid-cell-level-indicator">{{if eq .AQI 4}}❯{{else}}&nbsp;{{end}}</div>
+            <div class="grid-cell-level-indicator">{{if eq .AQI 3}}❯{{else}}&nbsp;{{end}}</div>
             <div class="grid-cell-level-label aqi-poor">Poor</div>
+            <div class="grid-cell-level-indicator">{{if eq .AQI 4}}❯{{else}}&nbsp;{{end}}</div>
+            <div class="grid-cell-level-label aqi-unhealthy">Unhealthy</div>
             <div class="grid-cell-level-indicator">{{if eq .AQI 5}}❯{{else}}&nbsp;{{end}}</div>
-            <div class="grid-cell-level-label aqi-very-poor">Very Poor</div>
+            <div class="grid-cell-level-label aqi-very-unhealthy">Hazardous</div>
         </span>
     </div>
 

@@ -118,6 +118,7 @@ func (s *Server) LoadRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /x/sunrise", s.HandleSunrise)
 	mux.HandleFunc("GET /x/sundial", s.HandleSundial)
 	mux.HandleFunc("GET /x/forecast", s.HandleForecastFull)
+	mux.HandleFunc("GET /x/aqi", s.HandleAqiPartial)
 
 	mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.Dir(s.config.StaticDir))))
 
