@@ -74,8 +74,33 @@ func (s *Server) HandleSunrise(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusServiceUnavailable)
 		return
 	}
-	partialData.AQI = pollutionData.Data[0].Main.AQI
 
+	co := pollutionData.Data[0].Components.CarbonMonoxide
+	no2 := pollutionData.Data[0].Components.NitrogenDioxide
+	o3 := pollutionData.Data[0].Components.Ozone
+	so2 := pollutionData.Data[0].Components.SulfurDioxide
+	pm25 := pollutionData.Data[0].Components.Particulates2_5
+	pm10 := pollutionData.Data[0].Components.Particulates10
+
+	aqi := max(
+		calculate_aqi(co/1.15/1000, co_con_breakpoints),
+		calculate_aqi(o3/1.96/1000, o3_con_breakpoints),
+		calculate_aqi(pm25, pm25_con_breakpoints),
+		calculate_aqi(pm10, pm10_con_breakpoints),
+		calculate_aqi(so2/2.62, so2_con_breakpoints),
+		calculate_aqi(no2/1.88, no2_con_breakpoints),
+	)
+	if aqi <= 50 {
+		partialData.AQI = 1
+	} else if aqi <= 100 {
+		partialData.AQI = 2
+	} else if aqi <= 150 {
+		partialData.AQI = 3
+	} else if aqi <= 200 {
+		partialData.AQI = 4
+	} else {
+		partialData.AQI = 5
+	}
 	slog.Debug("prepared sunrise partial", "data", partialData)
 
 	s.executeTemplate(w, "Sunrise", partialData)
@@ -159,11 +184,7 @@ func (s *Server) HandleForecastFull(w http.ResponseWriter, r *http.Request) {
 			RainChance:  int(hour.ProbabilityOfPrecipitation * 100),
 		}
 		t := time.Unix(int64(hour.Timestamp), 0).In(s.tz)
-		if t.Hour() < 12 {
-			hourData.Stamp = fmt.Sprintf("%d AM", t.Hour())
-		} else {
-			hourData.Stamp = fmt.Sprintf("%d PM", t.Hour()%13)
-		}
+		hourData.Stamp = hourStamp(t)
 		if hour.Rain.MillimetersPerHour > 0 {
 			hourData.TotalRain = fmt.Sprintf("%.1f", hour.Rain.MillimetersPerHour*CentimetersToInches)
 			hourData.RainOrSnowIcon = "wi-rain"
@@ -315,10 +336,15 @@ func calculate_aqi(concentration float64, con_breakpoints []float64) int {
 }
 
 func hourStamp(t time.Time) string {
-	if t.Hour() < 12 {
+	if t.Hour() == 0 {
+		return "12 AM"
+	} else if t.Hour() < 12 {
 		return fmt.Sprintf("%d AM", t.Hour())
+	} else if t.Hour() == 12 {
+		return "12 PM"
+	} else {
+		return fmt.Sprintf("%d PM", t.Hour()-12)
 	}
-	return fmt.Sprintf("%d PM", t.Hour()%13)
 }
 
 func moonPhaseToIcon(i int) string {
