@@ -1,6 +1,7 @@
 .subway {
     display: flex;
-    height: 220px;
+    height: 200px;
+    overflow: hidden;
 }
 
 .subway-segment {
