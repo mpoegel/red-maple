@@ -1,7 +1,8 @@
 .subway {
     display: flex;
     height: 200px;
-    overflow: hidden;
+    overflow: scroll;
+    width: 100%;
 }
 
 .subway-segment {
@@ -12,6 +13,9 @@
 
 .subway-station-label {
     writing-mode: vertical-lr;
+    text-overflow: clip;
+    overflow: hidden;
+    font-size: 15px;
 }
 
 .subway-track {

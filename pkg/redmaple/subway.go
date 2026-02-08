@@ -3,6 +3,8 @@ package redmaple
 import (
 	"log/slog"
 	"net/http"
+	"slices"
+	"strconv"
 	"strings"
 	"time"
 
@@ -61,7 +63,88 @@ func (s *Server) HandleSubway(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) HandleSubwayFull(w http.ResponseWriter, r *http.Request) {
-	s.executeTemplate(w, "SubwayFull", struct{}{})
+	trainLine := subway.LTrain
+	allStops, err := s.subwayCli.GetStopsOnLine(r.Context(), trainLine)
+	if err != nil {
+		slog.Error("failed to get stops", "err", err, "train", trainLine)
+		w.WriteHeader(http.StatusServiceUnavailable)
+		return
+	}
+	trains, alerts, err := s.subwayCli.GetTrains(r.Context(), trainLine)
+	if err != nil {
+		slog.Error("failed to get trains", "err", err, "train", trainLine)
+		w.WriteHeader(http.StatusServiceUnavailable)
+		return
+	}
+
+	data := api.SubwayFull{
+		Segments: []api.SubwaySegment{},
+		Alerts:   []string{},
+	}
+
+	stations := []subway.SubwayStop{}
+	for _, stop := range allStops {
+		if stop.LocationType == subway.RootStationType {
+			stations = append(stations, stop)
+		}
+	}
+	slices.SortFunc(stations, func(a, b subway.SubwayStop) int {
+		idA, _ := strconv.Atoi(a.ID[1:])
+		idB, _ := strconv.Atoi(b.ID[1:])
+		if idA < idB {
+			return -1
+		} else if idA > idB {
+			return 1
+		} else {
+			return 0
+		}
+	})
+
+	nextStopHasTrainApproaching := false
+	for _, station := range stations {
+		approachingSegment := api.SubwaySegment{}
+		stationSegment := api.SubwaySegment{
+			IsStation:      true,
+			StationName:    station.Name,
+			NoServiceNorth: (station.AreTrainsStopping & subway.TrainsStoppingNorth) == 0,
+			NoServiceSouth: (station.AreTrainsStopping & subway.TrainsStoppingSouth) == 0,
+		}
+
+		if nextStopHasTrainApproaching {
+			approachingSegment.HasTrainNorth = true
+			nextStopHasTrainApproaching = false
+		}
+
+		// check for a train at or approaching this station
+		for _, train := range trains {
+			if strings.HasPrefix(train.NextStop.ID, station.ID) {
+				if strings.HasSuffix(train.NextStop.ID, "N") {
+					if train.IsAtStop {
+						stationSegment.HasTrainNorth = true
+					} else {
+						nextStopHasTrainApproaching = true
+					}
+				} else if strings.HasSuffix(train.NextStop.ID, "S") {
+					if train.IsAtStop {
+						stationSegment.HasTrainSouth = true
+					} else {
+						approachingSegment.HasTrainSouth = true
+					}
+				}
+			}
+		}
+
+		data.Segments = append(data.Segments, approachingSegment, stationSegment)
+	}
+	data.Segments = append(data.Segments, api.SubwaySegment{
+		HasTrainNorth: nextStopHasTrainApproaching,
+	})
+
+	for _, alert := range alerts {
+		data.Alerts = append(data.Alerts, alert.DescriptionText.String())
+	}
+
+	s.executeTemplate(w, "SubwayFull", data)
 }
 
 func minutesUntilArrival(arrival int64, tz *time.Location) int {

@@ -62,6 +62,10 @@ a {
     height: 335px;
 }
 
+.grid-cell-1xn-tall {
+    width: 790px;
+}
+
 .grid-cell-level-indicator {
     flex-basis: 5%;
 }

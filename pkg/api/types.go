@@ -129,3 +129,17 @@ type SunForecast struct {
 	MoonIcon  string
 	UVIndex   int
 }
+
+type SubwayFull struct {
+	Segments []SubwaySegment
+	Alerts   []string
+}
+
+type SubwaySegment struct {
+	IsStation      bool
+	StationName    string
+	HasTrainNorth  bool
+	HasTrainSouth  bool
+	NoServiceNorth bool
+	NoServiceSouth bool
+}
