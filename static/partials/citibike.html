@@ -1,27 +1,16 @@
 {{define "Citibike"}}
 <div>
-
+    {{ range .Stations}}
     <span class="inline-grid bike-table">
-        <div class="grid-cell-1xn bike-station">{{.First.Name}}</div>
+        <div class="grid-cell-1xn bike-station">{{.Name}}</div>
         <div class="grid-cell-1xn">
-            <span class="total-bikes">{{.First.TotalBikes}}</span>
+            <span class="total-bikes">{{.TotalBikes}}</span>
             <span class="inline-grid bike-details">
-                <div class="grid-cell-1xn">◌ {{.First.NumBikes}}</div>
-                <div class="grid-cell-1xn"><i class="wi wi-lightning"></i> {{.First.NumEbikes}}</div>
+                <div class="grid-cell-1xn">◌ {{.NumBikes}}</div>
+                <div class="grid-cell-1xn"><i class="wi wi-lightning"></i> {{.NumEbikes}}</div>
             </span>
         </div>
     </span>
-
-    <span class="inline-grid bike-table">
-        <div class="grid-cell-1xn bike-station">{{.Second.Name}}</div>
-        <div class="grid-cell-1xn">
-            <span class="total-bikes">{{.Second.TotalBikes}}</span>
-            <span class="inline-grid bike-details">
-                <div class="grid-cell-1xn">◌ {{.Second.NumBikes}}</div>
-                <div class="grid-cell-1xn"><i class="wi wi-lightning"></i> {{.Second.NumEbikes}}</div>
-            </span>
-        </div>
-    </span>
-
+    {{end}}
 </div>
 {{end}}

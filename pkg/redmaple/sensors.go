@@ -114,3 +114,7 @@ func (s *Server) HandleOutdoor(w http.ResponseWriter, r *http.Request) {
 func (s *Server) HandleOutdoorFull(w http.ResponseWriter, r *http.Request) {
 	s.executeTemplate(w, "OutdoorFull", struct{}{})
 }
+
+func (s *Server) HandleIndoorFull(w http.ResponseWriter, r *http.Request) {
+	s.executeTemplate(w, "OutdoorFull", struct{}{})
+}

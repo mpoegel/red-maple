@@ -26,9 +26,7 @@ type Server struct {
 	tz     *time.Location
 	wg     sync.WaitGroup
 
-	citibikeStations []string
-	citibike         citibike.Client
-
+	citibike   citibike.Client
 	subwayCli  subway.Client
 	weatherCli weather.Client
 	haClient   ha.Client
@@ -69,7 +67,7 @@ func NewServer(config Config) (*Server, error) {
 		config:     config,
 		tz:         tz,
 		wg:         sync.WaitGroup{},
-		citibike:   citibike.NewCachedClient(),
+		citibike:   citibike.NewClient(),
 		subwayCli:  subwayCli,
 		weatherCli: weather.NewClient(weatherLat, weatherLon, config.WeatherAPIKey),
 		haClient:   ha.NewClient(config.HomeAssistant.Endpoint, config.HomeAssistant.APIKey),
@@ -89,14 +87,6 @@ func NewServer(config Config) (*Server, error) {
 		s.config.HomeAssistant.OutdoorTempID,
 		s.config.HomeAssistant.OutdoorHumidityID))
 
-	stationNames := strings.Split(config.CitibikeStations, ",")
-	stations, err := loadCitibikeStations(context.TODO(), s.citibike, stationNames)
-	if err != nil {
-		return nil, err
-	}
-	s.citibikeStations = stations
-	slog.Debug("preloaded citibike", "stations", stations, "names", stationNames)
-
 	s.LoadRoutes(mux)
 
 	return &s, nil
@@ -105,6 +95,7 @@ func NewServer(config Config) (*Server, error) {
 func (s *Server) LoadRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /{$}", s.HandleIndex)
 	mux.HandleFunc("GET /outdoor", s.HandleOutdoorFull)
+	mux.HandleFunc("GET /indoor", s.HandleIndoorFull)
 	mux.HandleFunc("GET /subway", s.HandleSubwayFull)
 	mux.HandleFunc("GET /sunrise", s.HandleSunriseFull)
 	mux.HandleFunc("GET /bikes", s.HandleBikesFull)

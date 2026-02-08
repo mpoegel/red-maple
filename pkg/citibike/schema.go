@@ -28,23 +28,25 @@ type StationStatus struct {
 
 type StationInformationResponse struct {
 	Data struct {
-		Stations []struct {
-			Longitude  float64 `json:"lon"`
-			ShortName  string  `json:"short_name"`
-			StationID  string  `json:"station_id"`
-			RentalURIs struct {
-				Android string `json:"android"`
-				IOS     string `json:"ios"`
-			} `json:"rental_uris"`
-			RegionID string  `json:"region_id"`
-			Name     string  `json:"name"`
-			Capacity int     `json:"capacity"`
-			Latitude float64 `json:"lat"`
-		} `json:"stations"`
+		Stations []StationInfo `json:"stations"`
 	} `json:"data"`
 	LastUpdated int    `json:"last_updated"`
 	TimeToLive  int    `json:"ttl"`
 	Version     string `json:"version"`
+}
+
+type StationInfo struct {
+	Longitude  float64 `json:"lon"`
+	ShortName  string  `json:"short_name"`
+	StationID  string  `json:"station_id"`
+	RentalURIs struct {
+		Android string `json:"android"`
+		IOS     string `json:"ios"`
+	} `json:"rental_uris"`
+	RegionID string  `json:"region_id"`
+	Name     string  `json:"name"`
+	Capacity int     `json:"capacity"`
+	Latitude float64 `json:"lat"`
 }
 
 type VehicleTypesResponse struct {

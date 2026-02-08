@@ -1,12 +1,9 @@
 package redmaple
 
 import (
-	"context"
 	"errors"
-	"fmt"
 	"log/slog"
 	"net/http"
-	"strings"
 
 	api "github.com/mpoegel/red-maple/pkg/api"
 	citibike "github.com/mpoegel/red-maple/pkg/citibike"
@@ -19,25 +16,24 @@ func (s *Server) HandleCitibike(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusServiceUnavailable)
 		return
 	}
-	data := api.CitibikePartial{}
-	// TODO refactor names/station ID
-	names := strings.Split(s.config.CitibikeStations, ",")
-	// TODO error checking that there are two stations
-	if first, err := findStationStatus(stationStatus, s.citibikeStations[0]); err != nil {
-		slog.Error("failed to get find citibike station status", "err", err, "station", s.citibikeStations[0])
-		w.WriteHeader(http.StatusServiceUnavailable)
-		return
-	} else {
-		data.First = *first
-		data.First.Name = names[0]
+	data := api.CitibikePartial{
+		Stations: []api.CitibikeStation{},
 	}
-	if second, err := findStationStatus(stationStatus, s.citibikeStations[1]); err != nil {
-		slog.Error("failed to get find citibike station status", "err", err, "station", s.citibikeStations[1])
-		w.WriteHeader(http.StatusServiceUnavailable)
-		return
-	} else {
-		data.Second = *second
-		data.Second.Name = names[1]
+	for i := 0; i < max(len(s.config.CitibikeStations), 2); i++ {
+		id, err := s.citibike.GetStationID(r.Context(), s.config.CitibikeStations[i])
+		if err != nil {
+			slog.Error("failed to find citibike station", "err", err, "station", s.config.CitibikeStations[i])
+			w.WriteHeader(http.StatusServiceUnavailable)
+			return
+		}
+		if status, err := findStationStatus(stationStatus, id); err != nil {
+			slog.Error("failed to get find citibike station status", "err", err, "station", id)
+			w.WriteHeader(http.StatusServiceUnavailable)
+			return
+		} else {
+			data.Stations = append(data.Stations, *status)
+			data.Stations[i].Name = s.config.CitibikeStations[i]
+		}
 	}
 
 	s.executeTemplate(w, "Citibike", data)
@@ -45,28 +41,6 @@ func (s *Server) HandleCitibike(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) HandleBikesFull(w http.ResponseWriter, r *http.Request) {
 	s.executeTemplate(w, "BikesFull", struct{}{})
-}
-
-func loadCitibikeStations(ctx context.Context, client citibike.Client, names []string) ([]string, error) {
-	stationInfo, err := client.GetStationInformation(ctx)
-	if err != nil {
-		return nil, err
-	}
-	res := []string{}
-	for _, name := range names {
-		found := false
-		for _, si := range stationInfo.Data.Stations {
-			if si.Name == name {
-				res = append(res, si.StationID)
-				found = true
-				break
-			}
-		}
-		if !found {
-			return nil, fmt.Errorf("citibike station not found: %s", name)
-		}
-	}
-	return res, nil
 }
 
 func findStationStatus(stationStatus *citibike.StationStatusResponse, stationID string) (*api.CitibikeStation, error) {

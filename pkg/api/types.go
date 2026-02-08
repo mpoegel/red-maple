@@ -8,8 +8,7 @@ type DatetimePartial struct {
 }
 
 type CitibikePartial struct {
-	First  CitibikeStation
-	Second CitibikeStation
+	Stations []CitibikeStation
 }
 
 type CitibikeStation struct {

@@ -12,7 +12,7 @@ type Config struct {
 	StaticDir        string
 	VendorDir        string
 	Timezone         string
-	CitibikeStations string
+	CitibikeStations []string
 	SubwayStops      string
 	WeatherLocation  string
 	WeatherAPIKey    string
@@ -43,7 +43,7 @@ func LoadConfig() Config {
 		StaticDir:        loadStrEnv("STATIC_DIR", "./static"),
 		VendorDir:        loadStrEnv("VENDOR_DIR", "./vendored"),
 		Timezone:         loadStrEnv("TIMEZONE", "America/New_York"),
-		CitibikeStations: loadStrEnv("CITIBIKE_STATIONS", "Park Ave & E 42 St,Park Ave & E 41 St"),
+		CitibikeStations: loadStrListEnv("CITIBIKE_STATIONS", []string{"Park Ave & E 42 St", "Park Ave & E 41 St"}),
 		SubwayStops:      loadStrEnv("SUBWAY_STOPS", "L03S,G29N"),
 		WeatherLocation:  loadStrEnv("WEATHER_LOC", "40.75261,-73.97728"),
 		WeatherAPIKey:    loadStrEnv("WEATHER_API_KEY", ""),
@@ -103,4 +103,12 @@ func loadDurationEnv(name string, defaultVal time.Duration) time.Duration {
 		return defaultVal
 	}
 	return val
+}
+
+func loadStrListEnv(name string, defaultVal []string) []string {
+	val, ok := os.LookupEnv(name)
+	if !ok {
+		return defaultVal
+	}
+	return strings.Split(val, ",")
 }
