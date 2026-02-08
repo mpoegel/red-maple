@@ -4,8 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"log/slog"
 	"net/http"
 	"time"
+
+	api "github.com/mpoegel/red-maple/pkg/api"
 )
 
 const (
@@ -20,6 +23,8 @@ type Client interface {
 	GetStationInformation(ctx context.Context) (*StationInformationResponse, error)
 	GetStationStatus(ctx context.Context) (*StationStatusResponse, error)
 	GetStationID(ctx context.Context, name string) (string, error)
+	GetNumBikesAtStation(ctx context.Context, name string) (numClassics, numEbikes int, err error)
+	GetProvider(stationName string) api.ProviderFunc
 }
 
 type ClientImpl struct {
@@ -149,4 +154,63 @@ func (c *ClientImpl) GetStationID(ctx context.Context, name string) (string, err
 		return "", errors.New("station not found")
 	}
 	return station.StationID, nil
+}
+
+func (c *ClientImpl) GetNumBikesAtStation(ctx context.Context, name string) (numClassics, numEbikes int, err error) {
+	stations, err := c.GetStationStatus(ctx)
+	if err != nil {
+		return
+	}
+
+	id, err := c.GetStationID(ctx, name)
+	if err != nil {
+		return
+	}
+
+	for _, station := range stations.Data.Stations {
+		if station.StationID == id {
+			numClassics = countBikes(&station, classicBikeID)
+			numEbikes = countBikes(&station, eBikeID)
+			slog.Debug("counted bikes", "station", name, "classics", numClassics, "ebikes", numEbikes)
+			return
+		}
+	}
+	err = errors.New("station status not found")
+	return
+}
+
+const (
+	classicBikeID = "1"
+	eBikeID       = "2"
+)
+
+func countBikes(stationStatus *StationStatus, bikeType string) int {
+	for _, id := range stationStatus.VehicleTypesAvailable {
+		if id.VehicleTypeID == bikeType {
+			return id.Count
+		}
+	}
+	return 0
+}
+
+func (c *ClientImpl) GetProvider(stationName string) api.ProviderFunc {
+	return func(ctx context.Context) (*api.DataPoint, error) {
+		numClassics, numEbikes, err := c.GetNumBikesAtStation(ctx, stationName)
+		if err != nil {
+			return nil, err
+		}
+
+		data := &api.DataPoint{
+			Table: "citibike",
+			Tags: map[api.DataTag]string{
+				api.LocationTag: stationName,
+			},
+			Fields: map[string]any{
+				"classics": numClassics,
+				"ebikes":   numEbikes,
+			},
+			Stamp: time.Now(),
+		}
+		return data, nil
+	}
 }

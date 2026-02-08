@@ -86,6 +86,9 @@ func NewServer(config Config) (*Server, error) {
 		s.config.HomeAssistant.IndoorHumidityID,
 		s.config.HomeAssistant.OutdoorTempID,
 		s.config.HomeAssistant.OutdoorHumidityID))
+	for _, stationName := range s.config.CitibikeStations {
+		s.exportHub.AddProvider(s.citibike.GetProvider(stationName))
+	}
 
 	s.LoadRoutes(mux)
 
