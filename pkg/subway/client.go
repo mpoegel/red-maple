@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"log/slog"
 	"net/http"
@@ -58,11 +59,32 @@ type Client interface {
 type ClientImpl struct {
 	httpClient *http.Client
 	stopMap    map[string]SubwayStop
+	feedURLs   map[TrainLine]string
 }
 
 var _ Client = (*ClientImpl)(nil)
 
-func NewClient(dataDir string) (*ClientImpl, error) {
+type Option func(*ClientImpl)
+
+func WithHTTPClient(client *http.Client) Option {
+	return func(c *ClientImpl) {
+		c.httpClient = client
+	}
+}
+
+func WithStopMap(stopMap map[string]SubwayStop) Option {
+	return func(c *ClientImpl) {
+		c.stopMap = stopMap
+	}
+}
+
+func WithFeedURLs(urls map[TrainLine]string) Option {
+	return func(c *ClientImpl) {
+		c.feedURLs = urls
+	}
+}
+
+func NewClient(dataDir string, opts ...Option) (*ClientImpl, error) {
 	stopMap := map[string]SubwayStop{}
 
 	fp, err := os.Open(path.Join(dataDir, "mta/stops.txt"))
@@ -95,15 +117,26 @@ func NewClient(dataDir string) (*ClientImpl, error) {
 		}
 	}
 
-	return &ClientImpl{
+	c, _ := NewClientWithOptions(opts...)
+	c.stopMap = stopMap
+	return c, nil
+}
+
+func NewClientWithOptions(opts ...Option) (*ClientImpl, error) {
+	c := &ClientImpl{
 		httpClient: http.DefaultClient,
-		stopMap:    stopMap,
-	}, nil
+		stopMap:    map[string]SubwayStop{},
+	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c, nil
 }
 
 func (c *ClientImpl) GetFeed(ctx context.Context, line TrainLine) (*FeedMessage, error) {
 	slog.Debug("getting subway feed", "line", line)
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, feedUrls[line], nil)
+	url := c.feedURLs[line]
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -114,6 +147,11 @@ func (c *ClientImpl) GetFeed(ctx context.Context, line TrainLine) (*FeedMessage,
 	}
 
 	defer resp.Body.Close()
+
+	if resp.StatusCode >= 400 {
+		return nil, fmt.Errorf("HTTP error: %d", resp.StatusCode)
+	}
+
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
