@@ -29,6 +29,7 @@ type Client interface {
 
 type ClientImpl struct {
 	httpClient *http.Client
+	baseURL    string
 
 	lastVehicleTypesResp       *VehicleTypesResponse
 	lastVehicleTypesUpdatedAt  time.Time
@@ -42,11 +43,36 @@ type ClientImpl struct {
 
 var _ Client = (*ClientImpl)(nil)
 
-func NewClient() *ClientImpl {
-	return &ClientImpl{
+type Option func(*ClientImpl)
+
+func WithHTTPClient(client *http.Client) Option {
+	return func(c *ClientImpl) {
+		c.httpClient = client
+	}
+}
+
+func WithBaseURL(url string) Option {
+	return func(c *ClientImpl) {
+		c.baseURL = url
+	}
+}
+
+func WithStationCache(cache map[string]StationInfo) Option {
+	return func(c *ClientImpl) {
+		c.stationCache = cache
+	}
+}
+
+func NewClient(opts ...Option) *ClientImpl {
+	c := &ClientImpl{
 		httpClient:   http.DefaultClient,
+		baseURL:      baseURL,
 		stationCache: map[string]StationInfo{},
 	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
 }
 
 func (c *ClientImpl) GetVehicleTypes(ctx context.Context) (*VehicleTypesResponse, error) {
@@ -55,7 +81,7 @@ func (c *ClientImpl) GetVehicleTypes(ctx context.Context) (*VehicleTypesResponse
 		return c.lastVehicleTypesResp, nil
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, baseURL+vehicleTypeEndpoint, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.baseURL+vehicleTypeEndpoint, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +109,7 @@ func (c *ClientImpl) GetStationInformation(ctx context.Context) (*StationInforma
 		return c.lastStationInfoResp, nil
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, baseURL+stationInfoEndpoint, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.baseURL+stationInfoEndpoint, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +138,7 @@ func (c *ClientImpl) GetStationStatus(ctx context.Context) (*StationStatusRespon
 		return c.lastStationStatusResp, nil
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, baseURL+stationStatusEndpoint, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.baseURL+stationStatusEndpoint, nil)
 	if err != nil {
 		return nil, err
 	}
