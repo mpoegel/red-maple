@@ -28,10 +28,10 @@ func (s *Server) HandleSubway(w http.ResponseWriter, r *http.Request) {
 	} else {
 		data.First.StopName = resp[0].Stop.Name
 		data.First.Destination = resp[0].Destination.Name
-		data.First.NextTrainIn = minutesUntilArrival(*resp[0].Arrival.Time, s.tz)
+		data.First.NextTrainIn = MinutesUntilArrival(*resp[0].Arrival.Time, s.tz)
 		data.First.FurtherTrains = []int{
-			minutesUntilArrival(*resp[1].Arrival.Time, s.tz),
-			minutesUntilArrival(*resp[2].Arrival.Time, s.tz),
+			MinutesUntilArrival(*resp[1].Arrival.Time, s.tz),
+			MinutesUntilArrival(*resp[2].Arrival.Time, s.tz),
 		}
 	}
 	data.First.TrainLine = string(subway.StopIdToLine(stops[0]))
@@ -48,10 +48,10 @@ func (s *Server) HandleSubway(w http.ResponseWriter, r *http.Request) {
 	} else {
 		data.Second.StopName = resp[0].Stop.Name
 		data.Second.Destination = resp[0].Destination.Name
-		data.Second.NextTrainIn = minutesUntilArrival(*resp[0].Arrival.Time, s.tz)
+		data.Second.NextTrainIn = MinutesUntilArrival(*resp[0].Arrival.Time, s.tz)
 		data.Second.FurtherTrains = []int{
-			minutesUntilArrival(*resp[1].Arrival.Time, s.tz),
-			minutesUntilArrival(*resp[2].Arrival.Time, s.tz),
+			MinutesUntilArrival(*resp[1].Arrival.Time, s.tz),
+			MinutesUntilArrival(*resp[2].Arrival.Time, s.tz),
 		}
 	}
 	data.Second.TrainLine = string(subway.StopIdToLine(stops[1]))
@@ -161,6 +161,6 @@ func (s *Server) HandleSubwayLine(w http.ResponseWriter, r *http.Request) {
 	s.executeTemplate(w, "SubwayLine", data)
 }
 
-func minutesUntilArrival(arrival int64, tz *time.Location) int {
+func MinutesUntilArrival(arrival int64, tz *time.Location) int {
 	return int(time.Until(time.Unix(arrival, 0).In(tz)).Minutes())
 }

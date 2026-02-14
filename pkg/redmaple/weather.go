@@ -65,7 +65,7 @@ func (s *Server) HandleSunrise(w http.ResponseWriter, r *http.Request) {
 	partialData := api.SunrisePartial{
 		SunriseTime:   fmt.Sprintf("%d:%02d", sunriseTime.Hour(), sunriseTime.Minute()),
 		SunsetTime:    fmt.Sprintf("%d:%02d", sunsetTime.Hour()-12, sunsetTime.Minute()),
-		MoonPhaseIcon: moonPhaseToIcon(int(weatherData.Daily[0].MoonPhase * 28)),
+		MoonPhaseIcon: MoonPhaseToIcon(int(weatherData.Daily[0].MoonPhase * 28)),
 	}
 
 	pollutionData, err := s.weatherCli.GetPollution(r.Context())
@@ -83,12 +83,12 @@ func (s *Server) HandleSunrise(w http.ResponseWriter, r *http.Request) {
 	pm10 := pollutionData.Data[0].Components.Particulates10
 
 	aqi := max(
-		calculate_aqi(co/1.15/1000, co_con_breakpoints),
-		calculate_aqi(o3/1.96/1000, o3_con_breakpoints),
-		calculate_aqi(pm25, pm25_con_breakpoints),
-		calculate_aqi(pm10, pm10_con_breakpoints),
-		calculate_aqi(so2/2.62, so2_con_breakpoints),
-		calculate_aqi(no2/1.88, no2_con_breakpoints),
+		CalculateAQI(co/1.15/1000, co_con_breakpoints),
+		CalculateAQI(o3/1.96/1000, o3_con_breakpoints),
+		CalculateAQI(pm25, pm25_con_breakpoints),
+		CalculateAQI(pm10, pm10_con_breakpoints),
+		CalculateAQI(so2/2.62, so2_con_breakpoints),
+		CalculateAQI(no2/1.88, no2_con_breakpoints),
 	)
 	if aqi <= 50 {
 		partialData.AQI = 1
@@ -184,7 +184,7 @@ func (s *Server) HandleForecastFull(w http.ResponseWriter, r *http.Request) {
 			RainChance:  int(hour.ProbabilityOfPrecipitation * 100),
 		}
 		t := time.Unix(int64(hour.Timestamp), 0).In(s.tz)
-		hourData.Stamp = hourStamp(t)
+		hourData.Stamp = HourStamp(t)
 		if hour.Rain.MillimetersPerHour > 0 {
 			hourData.TotalRain = fmt.Sprintf("%.1f", hour.Rain.MillimetersPerHour*CentimetersToInches)
 			hourData.RainOrSnowIcon = "wi-rain"
@@ -235,10 +235,10 @@ func (s *Server) HandleForecastFull(w http.ResponseWriter, r *http.Request) {
 			Stamp: fmt.Sprintf("%s %d %s to %s %d %s",
 				strings.ToUpper(start.Month().String()[:3]),
 				start.Day(),
-				hourStamp(start),
+				HourStamp(start),
 				strings.ToUpper(end.Month().String()[:3]),
 				end.Day(),
-				hourStamp(end),
+				HourStamp(end),
 			),
 			Description: alert.Description,
 		})
@@ -262,12 +262,12 @@ func (s *Server) HandleAqiPartial(w http.ResponseWriter, r *http.Request) {
 	pm10 := pollutionData.Data[0].Components.Particulates10
 
 	data := api.AqiPartial{
-		CarbonMonoxide:  calculate_aqi(co/1.15/1000, co_con_breakpoints),
-		Ozone:           calculate_aqi(o3/1.96/1000, o3_con_breakpoints),
-		Particulates2_5: calculate_aqi(pm25, pm25_con_breakpoints),
-		Particulates10:  calculate_aqi(pm10, pm10_con_breakpoints),
-		SulfurDioxide:   calculate_aqi(so2/2.62, so2_con_breakpoints),
-		NitrogenDioxide: calculate_aqi(no2/1.88, no2_con_breakpoints),
+		CarbonMonoxide:  CalculateAQI(co/1.15/1000, co_con_breakpoints),
+		Ozone:           CalculateAQI(o3/1.96/1000, o3_con_breakpoints),
+		Particulates2_5: CalculateAQI(pm25, pm25_con_breakpoints),
+		Particulates10:  CalculateAQI(pm10, pm10_con_breakpoints),
+		SulfurDioxide:   CalculateAQI(so2/2.62, so2_con_breakpoints),
+		NitrogenDioxide: CalculateAQI(no2/1.88, no2_con_breakpoints),
 	}
 	data.AQI = max(
 		data.CarbonMonoxide,
@@ -299,7 +299,7 @@ func (s *Server) HandleSunrises(w http.ResponseWriter, r *http.Request) {
 			DayOfWeek: strings.ToUpper(sunrise.Weekday().String())[:3],
 			Sunrise:   fmt.Sprintf("%d:%02d", sunrise.Hour(), sunrise.Minute()),
 			Sunset:    fmt.Sprintf("%d:%02d", sunset.Hour(), sunset.Minute()),
-			MoonIcon:  moonPhaseToIcon(int(day.MoonPhase * 28)),
+			MoonIcon:  MoonPhaseToIcon(int(day.MoonPhase * 28)),
 			UVIndex:   int(math.Round(day.UVIndex)),
 		})
 		if i >= 4 {
@@ -320,13 +320,13 @@ var (
 	no2_con_breakpoints  = []float64{0.0, 53, 54, 100, 101, 360, 361, 649, 650, 1249, 1250}
 )
 
-func calculate_aqi(concentration float64, con_breakpoints []float64) int {
+func CalculateAQI(concentration float64, conBreakpoints []float64) int {
 	i := 1
-	for i < len(con_breakpoints)-1 {
-		if concentration < con_breakpoints[i] {
+	for i < len(conBreakpoints)-1 {
+		if concentration < conBreakpoints[i] {
 			aqi := (aqi_breakpoints[i]-aqi_breakpoints[i-1])/
-				(con_breakpoints[i]-con_breakpoints[i-1])*
-				(concentration-con_breakpoints[i-1]) +
+				(conBreakpoints[i]-conBreakpoints[i-1])*
+				(concentration-conBreakpoints[i-1]) +
 				aqi_breakpoints[i-1]
 			return int(math.Round(aqi))
 		}
@@ -335,7 +335,7 @@ func calculate_aqi(concentration float64, con_breakpoints []float64) int {
 	return 0
 }
 
-func hourStamp(t time.Time) string {
+func HourStamp(t time.Time) string {
 	if t.Hour() == 0 {
 		return "12 AM"
 	} else if t.Hour() < 12 {
@@ -347,7 +347,7 @@ func hourStamp(t time.Time) string {
 	}
 }
 
-func moonPhaseToIcon(i int) string {
+func MoonPhaseToIcon(i int) string {
 	switch i % 28 {
 	default:
 		return "wi-moon-new"
