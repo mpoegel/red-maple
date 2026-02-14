@@ -10,10 +10,10 @@ import (
 )
 
 const (
-	url          = "https://api.openweathermap.org"
-	defaultUnits = "imperial"
-	weatherTTL   = 5 * time.Minute
-	pollutionTTL = 1 * time.Hour
+	defaultBaseURL = "https://api.openweathermap.org"
+	defaultUnits   = "imperial"
+	weatherTTL     = 5 * time.Minute
+	pollutionTTL   = 1 * time.Hour
 )
 
 type Client interface {
@@ -23,6 +23,7 @@ type Client interface {
 
 type ClientImpl struct {
 	httpClient *http.Client
+	baseURL    string
 	lat        float64
 	lon        float64
 	apiKey     string
@@ -36,13 +37,32 @@ type ClientImpl struct {
 
 var _ Client = (*ClientImpl)(nil)
 
-func NewClient(lat, lon float64, apiKey string) *ClientImpl {
-	return &ClientImpl{
+type Option func(*ClientImpl)
+
+func WithHTTPClient(client *http.Client) Option {
+	return func(c *ClientImpl) {
+		c.httpClient = client
+	}
+}
+
+func WithBaseURL(url string) Option {
+	return func(c *ClientImpl) {
+		c.baseURL = url
+	}
+}
+
+func NewClient(lat, lon float64, apiKey string, opts ...Option) *ClientImpl {
+	c := &ClientImpl{
 		httpClient: http.DefaultClient,
+		baseURL:    defaultBaseURL,
 		lat:        lat,
 		lon:        lon,
 		apiKey:     apiKey,
 	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
 }
 
 func (c *ClientImpl) GetWeather(ctx context.Context) (*WeatherData, error) {
@@ -52,7 +72,7 @@ func (c *ClientImpl) GetWeather(ctx context.Context) (*WeatherData, error) {
 		return c.lastData, nil
 	}
 
-	uri := fmt.Sprintf("%s/data/3.0/onecall?lat=%f&lon=%f&appid=%s&units=%s", url, c.lat, c.lon, c.apiKey, defaultUnits)
+	uri := fmt.Sprintf("%s/data/3.0/onecall?lat=%f&lon=%f&appid=%s&units=%s", c.baseURL, c.lat, c.lon, c.apiKey, defaultUnits)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, uri, nil)
 	if err != nil {
 		return nil, err
@@ -63,6 +83,10 @@ func (c *ClientImpl) GetWeather(ctx context.Context) (*WeatherData, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode >= 400 {
+		return nil, fmt.Errorf("HTTP error: %d", resp.StatusCode)
+	}
 
 	data := &WeatherData{}
 	decoder := json.NewDecoder(resp.Body)
@@ -82,7 +106,7 @@ func (c *ClientImpl) GetPollution(ctx context.Context) (*PollutionData, error) {
 		return c.lastPollutionData, nil
 	}
 
-	uri := fmt.Sprintf("%s/data/2.5/air_pollution?lat=%f&lon=%f&appid=%s", url, c.lat, c.lon, c.apiKey)
+	uri := fmt.Sprintf("%s/data/2.5/air_pollution?lat=%f&lon=%f&appid=%s", c.baseURL, c.lat, c.lon, c.apiKey)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, uri, nil)
 	if err != nil {
 		return nil, err
@@ -93,6 +117,10 @@ func (c *ClientImpl) GetPollution(ctx context.Context) (*PollutionData, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode >= 400 {
+		return nil, fmt.Errorf("HTTP error: %d", resp.StatusCode)
+	}
 
 	data := &PollutionData{}
 	decoder := json.NewDecoder(resp.Body)
