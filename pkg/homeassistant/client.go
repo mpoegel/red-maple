@@ -26,13 +26,31 @@ type ClientImpl struct {
 
 var _ Client = (*ClientImpl)(nil)
 
-func NewClient(endpoint string, apiKey string) *ClientImpl {
-	return &ClientImpl{
+type Option func(*ClientImpl)
+
+func WithHTTPClient(client *http.Client) Option {
+	return func(c *ClientImpl) {
+		c.httpClient = client
+	}
+}
+
+func WithCache(cache map[string]*DeviceState) Option {
+	return func(c *ClientImpl) {
+		c.cache = cache
+	}
+}
+
+func NewClient(endpoint string, apiKey string, opts ...Option) *ClientImpl {
+	c := &ClientImpl{
 		httpClient: http.DefaultClient,
 		endpoint:   endpoint,
 		apiKey:     apiKey,
 		cache:      map[string]*DeviceState{},
 	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
 }
 
 func (c *ClientImpl) GetDeviceState(ctx context.Context, deviceID string) (*DeviceState, error) {
@@ -51,6 +69,10 @@ func (c *ClientImpl) GetDeviceState(ctx context.Context, deviceID string) (*Devi
 		return nil, err
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode >= 400 {
+		return nil, fmt.Errorf("HTTP error: %d", resp.StatusCode)
+	}
 
 	data := &DeviceState{}
 	decoder := json.NewDecoder(resp.Body)
