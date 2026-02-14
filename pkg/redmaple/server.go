@@ -106,6 +106,7 @@ func (s *Server) LoadRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /x/datetime", s.HandleDatetime)
 	mux.HandleFunc("GET /x/citibike", s.HandleCitibike)
 	mux.HandleFunc("GET /x/subway", s.HandleSubway)
+	mux.HandleFunc("GET /x/subwayline", s.HandleSubwayLine)
 	mux.HandleFunc("GET /x/weather", s.HandleWeather)
 	mux.HandleFunc("GET /x/indoor", s.HandleIndoor)
 	mux.HandleFunc("GET /x/outdoor", s.HandleOutdoor)

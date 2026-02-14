@@ -7,55 +7,34 @@
 <body>
     <div class="grid" id="main-grid">
         <div class="grid-cell-1xn grid-cell-1xn-tall">
-            <div class="grid-cell-1xn">
-                <div class="subway">
-                    <div class="subway-segment">
-                        <span class="subway-track">←</span>
-                        <span class="subway-track">→</span>
-                    </div>
-                    {{range .Segments}}
-                    {{template "SubwaySegment" .}}
-                    {{end}}
-                    <div class="subway-segment">
-                        <span class="subway-track">←</span>
-                        <span class="subway-track">→</span>
-                    </div>
-                </div>
-            </div>
-            <div class="subway-status">
-                {{range .Alerts}}
-                <p>{{.}}</p>
-                {{else}}
-                Good Service.
-                {{end}}
-            </div>
+            <div class="grid-cell-1xn" hx-get="/x/subwayline?line={{.Line}}" hx-trigger="load"></div>
             <div class="subway-selection">
-                <span>[1]</span>
-                <span>[2]</span>
-                <span>[3]</span>
-                <span class="has-disruption">[4]</span>
-                <span class="has-disruption">[5]</span>
-                <span>[6]</span>
-                <span>[7]</span>
-                <span>[A]</span>
-                <span>[B]</span>
-                <span>[C]</span>
-                <span>[D]</span>
-                <span>[E]</span>
-                <span>[F]</span>
-                <span class="has-disruption">[G]</span>
-                <span>[J]</span>
-                <span>[L]</span>
-                <span>[M]</span>
-                <span>[N]</span>
-                <span>[Q]</span>
-                <span>[R]</span>
-                <span>[S]</span>
-                <span>[W]</span>
-                <span>[Z]</span>
+                <!-- TODO highlight disruptions with .has-disruption class -->
+                <span><a href="/subway?line=1">[1]</a></span>
+                <span><a href="/subway?line=2">[2]</a></span>
+                <span><a href="/subway?line=3">[3]</a></span>
+                <span><a href="/subway?line=4">[4]</a></span>
+                <span><a href="/subway?line=5">[5]</a></span>
+                <span><a href="/subway?line=6">[6]</a></span>
+                <span><a href="/subway?line=7">[7]</a></span>
+                <span><a href="/subway?line=A">[A]</a></span>
+                <span><a href="/subway?line=B">[B]</a></span>
+                <span><a href="/subway?line=C">[C]</a></span>
+                <span><a href="/subway?line=D">[D]</a></span>
+                <span><a href="/subway?line=E">[E]</a></span>
+                <span><a href="/subway?line=F">[F]</a></span>
+                <span><a href="/subway?line=G">[G]</a></span>
+                <span><a href="/subway?line=J">[J]</a></span>
+                <span><a href="/subway?line=L">[L]</a></span>
+                <span><a href="/subway?line=M">[M]</a></span>
+                <span><a href="/subway?line=N">[N]</a></span>
+                <span><a href="/subway?line=Q">[Q]</a></span>
+                <span><a href="/subway?line=R">[R]</a></span>
+                <span><a href="/subway?line=S">[S]</a></span>
+                <span><a href="/subway?line=W">[W]</a></span>
+                <span><a href="/subway?line=Z">[Z]</a></span>
             </div>
         </div>
-
         <div class="grid-cell-2xn" hx-get="/x/datetime" hx-trigger="load, every 1s"></div>
         <div class="grid-cell-2xn">
             {{template "Navigation"}}
@@ -66,6 +45,29 @@
 <script src="/static/js/index.js"></script>
 
 </html>
+{{end}}
+
+{{define "SubwayLine"}}
+<div class="subway">
+    <div class="subway-segment">
+        <span class="subway-track">←</span>
+        <span class="subway-track">→</span>
+    </div>
+    {{range .Segments}}
+    {{template "SubwaySegment" .}}
+    {{end}}
+    <div class="subway-segment">
+        <span class="subway-track">←</span>
+        <span class="subway-track">→</span>
+    </div>
+</div>
+<div class="subway-status">
+    {{range .Alerts}}
+    <p>{{.}}</p>
+    {{else}}
+    Good Service.
+    {{end}}
+</div>
 {{end}}
 
 {{define "SubwaySegment"}}

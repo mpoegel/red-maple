@@ -131,6 +131,10 @@ type SunForecast struct {
 }
 
 type SubwayFull struct {
+	Line string
+}
+
+type SubwayLine struct {
 	Segments []SubwaySegment
 	Alerts   []string
 }

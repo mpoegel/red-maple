@@ -63,21 +63,35 @@ func (s *Server) HandleSubway(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) HandleSubwayFull(w http.ResponseWriter, r *http.Request) {
-	trainLine := subway.LTrain
-	allStops, err := s.subwayCli.GetStopsOnLine(r.Context(), trainLine)
-	if err != nil {
-		slog.Error("failed to get stops", "err", err, "train", trainLine)
-		w.WriteHeader(http.StatusServiceUnavailable)
-		return
+	lineParam := r.URL.Query().Get("line")
+	if lineParam == "" {
+		lineParam = "L"
 	}
-	trains, alerts, err := s.subwayCli.GetTrains(r.Context(), trainLine)
-	if err != nil {
-		slog.Error("failed to get trains", "err", err, "train", trainLine)
-		w.WriteHeader(http.StatusServiceUnavailable)
-		return
-	}
+	s.executeTemplate(w, "SubwayFull", api.SubwayFull{Line: lineParam})
+}
 
-	data := api.SubwayFull{
+func (s *Server) HandleSubwayLine(w http.ResponseWriter, r *http.Request) {
+	lineParam := r.URL.Query().Get("line")
+	if lineParam == "" {
+		lineParam = "L"
+	}
+	line := subway.ParseTrainLine(lineParam)
+	if line == subway.UnknownTrain {
+		line = subway.LTrain
+	}
+	allStops, err := s.subwayCli.GetStopsOnLine(r.Context(), line)
+	if err != nil {
+		slog.Error("failed to get stops", "err", err, "train", line)
+		w.WriteHeader(http.StatusServiceUnavailable)
+		return
+	}
+	trains, alerts, err := s.subwayCli.GetTrains(r.Context(), line)
+	if err != nil {
+		slog.Error("failed to get trains", "err", err, "train", line)
+		w.WriteHeader(http.StatusServiceUnavailable)
+		return
+	}
+	data := api.SubwayLine{
 		Segments: []api.SubwaySegment{},
 		Alerts:   []string{},
 	}
@@ -144,7 +158,7 @@ func (s *Server) HandleSubwayFull(w http.ResponseWriter, r *http.Request) {
 		data.Alerts = append(data.Alerts, alert.DescriptionText.String())
 	}
 
-	s.executeTemplate(w, "SubwayFull", data)
+	s.executeTemplate(w, "SubwayLine", data)
 }
 
 func minutesUntilArrival(arrival int64, tz *time.Location) int {
