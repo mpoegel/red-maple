@@ -75,7 +75,7 @@ func NewServer(config Config) (*Server, error) {
 	}
 
 	if config.InfluxDB.Enabled {
-		client, err := NewInfluxDBExporter(&config.InfluxDB)
+		client, err := NewInfluxDBClient(&config.InfluxDB)
 		if err != nil {
 			return nil, err
 		}

@@ -8,13 +8,13 @@ import (
 	api "github.com/mpoegel/red-maple/pkg/api"
 )
 
-type InfluxDBExporter struct {
+type InfluxDBClient struct {
 	client *influxdb3.Client
 }
 
-var _ api.DataExporter = (*InfluxDBExporter)(nil)
+var _ api.DataExporter = (*InfluxDBClient)(nil)
 
-func NewInfluxDBExporter(cfg *InfluxDBConfig) (*InfluxDBExporter, error) {
+func NewInfluxDBClient(cfg *InfluxDBConfig) (*InfluxDBClient, error) {
 	client, err := influxdb3.New(influxdb3.ClientConfig{
 		Host:     cfg.Endpoint,
 		Token:    cfg.Token,
@@ -23,16 +23,16 @@ func NewInfluxDBExporter(cfg *InfluxDBConfig) (*InfluxDBExporter, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &InfluxDBExporter{
+	return &InfluxDBClient{
 		client: client,
 	}, nil
 }
 
-func (e *InfluxDBExporter) Close() error {
+func (e *InfluxDBClient) Close() error {
 	return e.client.Close()
 }
 
-func (e *InfluxDBExporter) Export(ctx context.Context, dataPoints []*api.DataPoint) error {
+func (e *InfluxDBClient) Export(ctx context.Context, dataPoints []*api.DataPoint) error {
 	if len(dataPoints) == 0 {
 		return nil
 	}
@@ -48,4 +48,31 @@ func (e *InfluxDBExporter) Export(ctx context.Context, dataPoints []*api.DataPoi
 	return e.client.WritePoints(ctx,
 		points,
 		influxdb3.WithPrecision(lineprotocol.Second))
+}
+
+func (e *InfluxDBClient) QueryLast24Hours(ctx context.Context, table string) ([]map[string]any, error) {
+	return e.queryTable(ctx, table, "24 hours")
+}
+
+func (e *InfluxDBClient) QueryLast7Days(ctx context.Context, table string) ([]map[string]any, error) {
+	return e.queryTable(ctx, table, "7 days")
+}
+
+func (e *InfluxDBClient) QueryLast30Days(ctx context.Context, table string) ([]map[string]any, error) {
+	return e.queryTable(ctx, table, "30 days")
+}
+
+func (e *InfluxDBClient) queryTable(ctx context.Context, table, duration string) ([]map[string]any, error) {
+	query := "SELECT * FROM " + table + " WHERE time >= now() - interval '" + duration + "'"
+	iterator, err := e.client.Query(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+
+	var results []map[string]any
+	for iterator.Next() {
+		row := iterator.Value()
+		results = append(results, row)
+	}
+	return results, iterator.Err()
 }
