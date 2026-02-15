@@ -125,6 +125,7 @@ func NewClient(dataDir string, opts ...Option) (*ClientImpl, error) {
 func NewClientWithOptions(opts ...Option) (*ClientImpl, error) {
 	c := &ClientImpl{
 		httpClient: http.DefaultClient,
+		feedURLs:   feedUrls,
 		stopMap:    map[string]SubwayStop{},
 	}
 	for _, opt := range opts {
