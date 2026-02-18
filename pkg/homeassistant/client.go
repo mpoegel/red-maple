@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"sync"
 	"time"
 
 	api "github.com/mpoegel/red-maple/pkg/api"
@@ -21,6 +22,7 @@ type ClientImpl struct {
 	httpClient *http.Client
 	endpoint   string
 	apiKey     string
+	mu         sync.RWMutex
 	cache      map[string]*DeviceState
 }
 
@@ -80,11 +82,15 @@ func (c *ClientImpl) GetDeviceState(ctx context.Context, deviceID string) (*Devi
 		return nil, err
 	}
 
+	c.mu.Lock()
 	c.cache[deviceID] = data
+	c.mu.Unlock()
 	return data, nil
 }
 
 func (c *ClientImpl) DeviceCache(deviceID string) *DeviceState {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
 	return c.cache[deviceID]
 }
 

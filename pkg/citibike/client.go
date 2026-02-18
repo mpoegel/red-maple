@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"sync"
 	"time"
 
 	api "github.com/mpoegel/red-maple/pkg/api"
@@ -43,6 +44,7 @@ type ClientImpl struct {
 	lastStationStatusResp      *StationStatusResponse
 	lastStationStatusUpdatedAt time.Time
 
+	mu           sync.RWMutex
 	stationCache map[string]StationInfo
 }
 
@@ -167,20 +169,25 @@ func (c *ClientImpl) GetStationStatus(ctx context.Context) (*StationStatusRespon
 }
 
 func (c *ClientImpl) GetStationID(ctx context.Context, name string) (string, error) {
+	c.mu.RLock()
 	if station, ok := c.stationCache[name]; ok {
+		c.mu.RUnlock()
 		return station.StationID, nil
 	}
+	c.mu.RUnlock()
 
 	stationInfo, err := c.GetStationInformation(ctx)
 	if err != nil {
 		return "", err
 	}
 
+	c.mu.Lock()
 	for _, si := range stationInfo.Data.Stations {
 		c.stationCache[si.Name] = si
 	}
 
 	station, ok := c.stationCache[name]
+	c.mu.Unlock()
 	if !ok {
 		return "", errors.New("station not found")
 	}
