@@ -10,3 +10,11 @@
 .east-river-bike-controls {
     text-align: center;
 }
+
+.citibike-station {
+    max-width: 170px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+}

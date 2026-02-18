@@ -32,6 +32,7 @@ type Server struct {
 	haClient   ha.Client
 
 	exportHub *ExportHub
+	importer  api.Importer
 }
 
 func NewServer(config Config) (*Server, error) {
@@ -80,6 +81,7 @@ func NewServer(config Config) (*Server, error) {
 			return nil, err
 		}
 		s.exportHub.AddExporter(client)
+		s.importer = client
 	}
 	s.exportHub.AddProvider(s.haClient.GetProvider(
 		s.config.HomeAssistant.IndoorTempID,
@@ -102,6 +104,7 @@ func (s *Server) LoadRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /subway", s.HandleSubwayFull)
 	mux.HandleFunc("GET /sunrise", s.HandleSunriseFull)
 	mux.HandleFunc("GET /bikes", s.HandleBikesFull)
+	mux.HandleFunc("GET /bikes/history", s.HandleCitiBikeHistory)
 	mux.HandleFunc("GET /weather", s.HandleWeatherFull)
 	mux.HandleFunc("GET /x/datetime", s.HandleDatetime)
 	mux.HandleFunc("GET /x/citibike", s.HandleCitibike)

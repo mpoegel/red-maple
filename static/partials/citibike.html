@@ -14,3 +14,56 @@
     {{end}}
 </div>
 {{end}}
+
+{{define "CitibikeHistory"}}
+<div class="graph-full">
+    <div class="graph-header">
+        <span hx-get="/bikes/history?station={{.Station}}&days=30&kind={{.BikeKind}}" hx-target="#bike-history"
+            hx-trigger="click">
+            {{if eq .Days 30}}[{{end}}30 DAYS{{if eq .Days 30}}]{{end}}</span>
+        <span hx-get="/bikes/history?station={{.Station}}&days=7&kind={{.BikeKind}}" hx-target="#bike-history"
+            hx-trigger="click">
+            {{if eq .Days 7}}[{{end}}7 DAYS{{if eq .Days 7}}]{{end}}</span>
+        <span hx-get="/bikes/history?station={{.Station}}&days=1&kind={{.BikeKind}}" hx-target="#bike-history"
+            hx-trigger="click">
+            {{if eq .Days 1}}[{{end}}24 HOURS{{if eq .Days 1}}]{{end}}</span>
+    </div>
+    <div class="graph-top">
+        <div class="graph-y-axis">
+            <div class="graph-y-max">{{.MaxY}}</div>
+            <div class="graph-y-min">{{.MinY}}</div>
+        </div>
+        <div class="graph-area">
+            {{range .Data}}
+            <span class="graph-col"
+                style="margin-bottom: {{.Min}}px; height: {{.Max}}px; width: {{.Width}}%;">&nbsp;</span>
+            {{end}}
+        </div>
+    </div>
+    <div class="graph-bottom">
+        <div class="graph-x-axis">
+            <span class="graph-x-min">{{.StartTime}}</span>
+            <span class="graph-x-max">{{.EndTime}}</span>
+        </div>
+        <div class="graph-data-selection">
+            {{range .Stations}}
+            <span hx-get="/bikes/history?station={{.UrlSafeName}}&days={{.Days}}&kind={{.BikeKind}}"
+                hx-target="#bike-history" hx-trigger="click">{{if .IsSelected}}[{{end}}<span
+                    class="citibike-station">{{.Name}}</span>{{if
+                .IsSelected}}]{{end}}</span>
+            {{end}}
+        </div>
+        <div class="graph-data-selection">
+            <span hx-get="/bikes/history?station={{.Station}}&days={{.Days}}&kind=all" hx-target="#bike-history"
+                hx-trigger="click">
+                {{if eq .BikeKind "all"}}[{{end}}All{{if eq .BikeKind "all"}}]{{end}}</span>
+            <span hx-get="/bikes/history?station={{.Station}}&days={{.Days}}&kind=classic" hx-target="#bike-history"
+                hx-trigger="click">
+                {{if eq .BikeKind "classic"}}[{{end}}Classic{{if eq .BikeKind "classic"}}]{{end}}</span>
+            <span hx-get="/bikes/history?station={{.Station}}&days={{.Days}}&kind=electric" hx-target="#bike-history"
+                hx-trigger="click">
+                {{if eq .BikeKind "electric"}}[{{end}}Electric{{if eq .BikeKind "electric"}}]{{end}}</span>
+        </div>
+    </div>
+</div>
+{{end}}

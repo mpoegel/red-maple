@@ -13,6 +13,7 @@ type InfluxDBClient struct {
 }
 
 var _ api.DataExporter = (*InfluxDBClient)(nil)
+var _ api.Importer = (*InfluxDBClient)(nil)
 
 func NewInfluxDBClient(cfg *InfluxDBConfig) (*InfluxDBClient, error) {
 	client, err := influxdb3.New(influxdb3.ClientConfig{

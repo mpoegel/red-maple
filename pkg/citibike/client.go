@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"time"
@@ -16,6 +17,7 @@ const (
 	vehicleTypeEndpoint   = "vehicle_types.json"
 	stationInfoEndpoint   = "station_information.json"
 	stationStatusEndpoint = "station_status.json"
+	tableName             = "citibike"
 )
 
 type Client interface {
@@ -25,6 +27,9 @@ type Client interface {
 	GetStationID(ctx context.Context, name string) (string, error)
 	GetNumBikesAtStation(ctx context.Context, name string) (numClassics, numEbikes int, err error)
 	GetProvider(stationName string) api.ProviderFunc
+	GetHistoricalBikeCounts24Hours(ctx context.Context, importer api.Importer, stationName string) ([]HistoricalBikeCount, error)
+	GetHistoricalBikeCounts7Days(ctx context.Context, importer api.Importer, stationName string) ([]HistoricalBikeCount, error)
+	GetHistoricalBikeCounts30Days(ctx context.Context, importer api.Importer, stationName string) ([]HistoricalBikeCount, error)
 }
 
 type ClientImpl struct {
@@ -210,6 +215,12 @@ const (
 	eBikeID       = "2"
 )
 
+type HistoricalBikeCount struct {
+	Classics int
+	Ebikes   int
+	Stamp    time.Time
+}
+
 func countBikes(stationStatus *StationStatus, bikeType string) int {
 	for _, id := range stationStatus.VehicleTypesAvailable {
 		if id.VehicleTypeID == bikeType {
@@ -227,7 +238,7 @@ func (c *ClientImpl) GetProvider(stationName string) api.ProviderFunc {
 		}
 
 		data := &api.DataPoint{
-			Table: "citibike",
+			Table: tableName,
 			Tags: map[api.DataTag]string{
 				api.LocationTag: stationName,
 			},
@@ -239,4 +250,74 @@ func (c *ClientImpl) GetProvider(stationName string) api.ProviderFunc {
 		}
 		return data, nil
 	}
+}
+
+func (c *ClientImpl) GetHistoricalBikeCounts24Hours(ctx context.Context, importer api.Importer, stationName string) ([]HistoricalBikeCount, error) {
+	return c.queryBikeCounts(ctx, importer, stationName, func(i api.Importer, ctx context.Context) ([]map[string]any, error) {
+		return i.QueryLast24Hours(ctx, tableName)
+	})
+}
+
+func (c *ClientImpl) GetHistoricalBikeCounts7Days(ctx context.Context, importer api.Importer, stationName string) ([]HistoricalBikeCount, error) {
+	return c.queryBikeCounts(ctx, importer, stationName, func(i api.Importer, ctx context.Context) ([]map[string]any, error) {
+		return i.QueryLast7Days(ctx, tableName)
+	})
+}
+
+func (c *ClientImpl) GetHistoricalBikeCounts30Days(ctx context.Context, importer api.Importer, stationName string) ([]HistoricalBikeCount, error) {
+	return c.queryBikeCounts(ctx, importer, stationName, func(i api.Importer, ctx context.Context) ([]map[string]any, error) {
+		return i.QueryLast30Days(ctx, tableName)
+	})
+}
+
+type queryFunc func(importer api.Importer, ctx context.Context) ([]map[string]any, error)
+
+func (c *ClientImpl) queryBikeCounts(ctx context.Context, importer api.Importer, stationName string, queryFn queryFunc) ([]HistoricalBikeCount, error) {
+	rows, err := queryFn(importer, ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var results []HistoricalBikeCount
+	for _, row := range rows {
+		location, ok := row["location"].(string)
+		if !ok || location != stationName {
+			continue
+		}
+
+		var classics, ebikes int
+		if classicsVal, ok := row["classics"]; ok {
+			switch v := classicsVal.(type) {
+			case int64:
+				classics = int(v)
+			case float64:
+				classics = int(v)
+			default:
+				slog.Warn("unknown classics type", "type", fmt.Sprintf("%T", classicsVal))
+			}
+		}
+		if ebikesVal, ok := row["ebikes"]; ok {
+			switch v := ebikesVal.(type) {
+			case int64:
+				ebikes = int(v)
+			case float64:
+				ebikes = int(v)
+			default:
+				slog.Warn("unknown ebikes type", "type", fmt.Sprintf("%T", ebikesVal))
+			}
+		}
+
+		var stamp time.Time
+		if t, ok := row["time"].(time.Time); ok {
+			stamp = t
+		}
+
+		results = append(results, HistoricalBikeCount{
+			Classics: classics,
+			Ebikes:   ebikes,
+			Stamp:    stamp,
+		})
+	}
+
+	return results, nil
 }

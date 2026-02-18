@@ -2,10 +2,12 @@ package citibike_test
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"io"
 	"net/http"
 	"testing"
+	"time"
 
 	citibike "github.com/mpoegel/red-maple/pkg/citibike"
 )
@@ -760,5 +762,216 @@ func TestGetStationID_CachePopulates(t *testing.T) {
 
 	if mt.callCount != 1 {
 		t.Errorf("expected 1 HTTP call (cache populated), got %d", mt.callCount)
+	}
+}
+
+type mockImporter struct {
+	data24Hours []map[string]any
+	data7Days   []map[string]any
+	data30Days  []map[string]any
+	err         error
+}
+
+func (m *mockImporter) QueryLast24Hours(ctx context.Context, table string) ([]map[string]any, error) {
+	return m.data24Hours, m.err
+}
+
+func (m *mockImporter) QueryLast7Days(ctx context.Context, table string) ([]map[string]any, error) {
+	return m.data7Days, m.err
+}
+
+func (m *mockImporter) QueryLast30Days(ctx context.Context, table string) ([]map[string]any, error) {
+	return m.data30Days, m.err
+}
+
+func TestGetHistoricalBikeCounts24Hours_Success(t *testing.T) {
+	testTime := time.Date(2024, 1, 15, 10, 30, 0, 0, time.UTC)
+	importer := &mockImporter{
+		data24Hours: []map[string]any{
+			{"location": "Test Station", "classics": int64(5), "ebikes": int64(3), "time": testTime},
+			{"location": "Test Station", "classics": int64(4), "ebikes": int64(2), "time": testTime.Add(time.Hour)},
+			{"location": "Other Station", "classics": int64(10), "ebikes": int64(5), "time": testTime},
+		},
+	}
+
+	client := citibike.NewClient()
+
+	results, err := client.GetHistoricalBikeCounts24Hours(t.Context(), importer, "Test Station")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(results) != 2 {
+		t.Errorf("expected 2 results, got %d", len(results))
+	}
+	if results[0].Classics != 5 {
+		t.Errorf("expected first classics=5, got %d", results[0].Classics)
+	}
+	if results[0].Ebikes != 3 {
+		t.Errorf("expected first ebikes=3, got %d", results[0].Ebikes)
+	}
+	if results[1].Classics != 4 {
+		t.Errorf("expected second classics=4, got %d", results[1].Classics)
+	}
+}
+
+func TestGetHistoricalBikeCounts24Hours_NoMatchingLocation(t *testing.T) {
+	importer := &mockImporter{
+		data24Hours: []map[string]any{
+			{"location": "Other Station", "classics": int64(5), "ebikes": int64(3), "time": time.Now()},
+		},
+	}
+
+	client := citibike.NewClient()
+
+	results, err := client.GetHistoricalBikeCounts24Hours(t.Context(), importer, "Test Station")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(results) != 0 {
+		t.Errorf("expected 0 results, got %d", len(results))
+	}
+}
+
+func TestGetHistoricalBikeCounts24Hours_ImporterError(t *testing.T) {
+	importer := &mockImporter{
+		err: io.EOF,
+	}
+
+	client := citibike.NewClient()
+
+	_, err := client.GetHistoricalBikeCounts24Hours(t.Context(), importer, "Test Station")
+	if err == nil {
+		t.Fatal("expected error, got nil")
+	}
+}
+
+func TestGetHistoricalBikeCounts7Days_Success(t *testing.T) {
+	testTime := time.Date(2024, 1, 10, 10, 30, 0, 0, time.UTC)
+	importer := &mockImporter{
+		data7Days: []map[string]any{
+			{"location": "Test Station", "classics": int64(5), "ebikes": int64(3), "time": testTime},
+			{"location": "Test Station", "classics": int64(4), "ebikes": int64(2), "time": testTime.Add(time.Hour * 24)},
+		},
+	}
+
+	client := citibike.NewClient()
+
+	results, err := client.GetHistoricalBikeCounts7Days(t.Context(), importer, "Test Station")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(results) != 2 {
+		t.Errorf("expected 2 results, got %d", len(results))
+	}
+	if results[0].Classics != 5 {
+		t.Errorf("expected classics=5, got %d", results[0].Classics)
+	}
+	if results[0].Ebikes != 3 {
+		t.Errorf("expected ebikes=3, got %d", results[0].Ebikes)
+	}
+}
+
+func TestGetHistoricalBikeCounts7Days_NoMatchingLocation(t *testing.T) {
+	importer := &mockImporter{
+		data7Days: []map[string]any{
+			{"location": "Other Station", "classics": int64(5), "ebikes": int64(3), "time": time.Now()},
+		},
+	}
+
+	client := citibike.NewClient()
+
+	results, err := client.GetHistoricalBikeCounts7Days(t.Context(), importer, "Test Station")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(results) != 0 {
+		t.Errorf("expected 0 results, got %d", len(results))
+	}
+}
+
+func TestGetHistoricalBikeCounts7Days_ImporterError(t *testing.T) {
+	importer := &mockImporter{
+		err: io.EOF,
+	}
+
+	client := citibike.NewClient()
+
+	_, err := client.GetHistoricalBikeCounts7Days(t.Context(), importer, "Test Station")
+	if err == nil {
+		t.Fatal("expected error, got nil")
+	}
+}
+
+func TestGetHistoricalBikeCounts30Days_Success(t *testing.T) {
+	testTime := time.Date(2024, 1, 1, 10, 30, 0, 0, time.UTC)
+	importer := &mockImporter{
+		data30Days: []map[string]any{
+			{"location": "Test Station", "classics": int64(5), "ebikes": int64(3), "time": testTime},
+			{"location": "Test Station", "classics": int64(4), "ebikes": int64(2), "time": testTime.Add(time.Hour * 24 * 7)},
+			{"location": "Test Station", "classics": int64(6), "ebikes": int64(1), "time": testTime.Add(time.Hour * 24 * 14)},
+		},
+	}
+
+	client := citibike.NewClient()
+
+	results, err := client.GetHistoricalBikeCounts30Days(t.Context(), importer, "Test Station")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(results) != 3 {
+		t.Errorf("expected 3 results, got %d", len(results))
+	}
+	if results[2].Classics != 6 {
+		t.Errorf("expected classics=6, got %d", results[2].Classics)
+	}
+	if results[2].Ebikes != 1 {
+		t.Errorf("expected ebikes=1, got %d", results[2].Ebikes)
+	}
+}
+
+func TestGetHistoricalBikeCounts30Days_NoMatchingLocation(t *testing.T) {
+	importer := &mockImporter{
+		data30Days: []map[string]any{
+			{"location": "Other Station", "classics": int64(5), "ebikes": int64(3), "time": time.Now()},
+		},
+	}
+
+	client := citibike.NewClient()
+
+	results, err := client.GetHistoricalBikeCounts30Days(t.Context(), importer, "Test Station")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(results) != 0 {
+		t.Errorf("expected 0 results, got %d", len(results))
+	}
+}
+
+func TestGetHistoricalBikeCounts30Days_ImporterError(t *testing.T) {
+	importer := &mockImporter{
+		err: io.EOF,
+	}
+
+	client := citibike.NewClient()
+
+	_, err := client.GetHistoricalBikeCounts30Days(t.Context(), importer, "Test Station")
+	if err == nil {
+		t.Fatal("expected error, got nil")
+	}
+}
+
+func TestGetHistoricalBikeCounts_EmptyResult(t *testing.T) {
+	importer := &mockImporter{
+		data24Hours: []map[string]any{},
+	}
+
+	client := citibike.NewClient()
+
+	results, err := client.GetHistoricalBikeCounts24Hours(t.Context(), importer, "Test Station")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if results != nil {
+		t.Errorf("expected nil results for empty data, got %v", results)
 	}
 }

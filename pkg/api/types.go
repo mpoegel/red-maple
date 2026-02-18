@@ -18,6 +18,32 @@ type CitibikeStation struct {
 	NumEbikes  int
 }
 
+type CitibikeHistory struct {
+	Days      int
+	Station   string
+	BikeKind  string
+	MaxY      int
+	MinY      int
+	Data      []GraphPoint
+	StartTime string
+	EndTime   string
+	Stations  []CitibikeStationSelection
+}
+
+type GraphPoint struct {
+	Min   int
+	Max   int
+	Width float64
+}
+
+type CitibikeStationSelection struct {
+	Name        string
+	UrlSafeName string
+	Days        int
+	BikeKind    string
+	IsSelected  bool
+}
+
 type SubwayPartial struct {
 	First  SubwayUpdate
 	Second SubwayUpdate
