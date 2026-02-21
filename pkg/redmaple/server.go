@@ -76,14 +76,7 @@ func NewServer(config Config) (*Server, error) {
 		exportHub:  NewExportHub(config.ExportInterval),
 	}
 
-	if config.InfluxDB.Enabled {
-		client, err := NewInfluxDBClient(&config.InfluxDB)
-		if err != nil {
-			return nil, err
-		}
-		s.exportHub.AddExporter(client)
-		s.importer = client
-	} else if config.S3.Enabled {
+	if config.S3.Enabled {
 		client, err := s3.NewClient(
 			s3.WithBucket(config.S3.Bucket),
 			s3.WithCredentials(config.S3.AccessKey, config.S3.SecretKey),

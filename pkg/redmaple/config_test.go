@@ -81,18 +81,6 @@ func TestLoadConfigWithValidValues(t *testing.T) {
 	if config.HomeAssistant.IndoorHumidityID != "sensor.indoor_humidity" {
 		t.Errorf("expected HA_INDOOR_HUMID_ID=sensor.indoor_humidity, got %s", config.HomeAssistant.IndoorHumidityID)
 	}
-	if !config.InfluxDB.Enabled {
-		t.Errorf("expected INFLUXDB_ENABLED=true, got %v", config.InfluxDB.Enabled)
-	}
-	if config.InfluxDB.Endpoint != "https://us-east-1-1.aws.cloud2.influxdata.com" {
-		t.Errorf("expected INFLUXDB_ENDPOINT, got %s", config.InfluxDB.Endpoint)
-	}
-	if config.InfluxDB.Token != "test-influx-token" {
-		t.Errorf("expected INFLUXDB_TOKEN, got %s", config.InfluxDB.Token)
-	}
-	if config.InfluxDB.Database != "mydb" {
-		t.Errorf("expected INFLUXDB_DATABASE=mydb, got %s", config.InfluxDB.Database)
-	}
 	if config.ExportInterval != 30*time.Second {
 		t.Errorf("expected EXPORT_INTERVAL=30s, got %v", config.ExportInterval)
 	}
@@ -109,18 +97,6 @@ func TestLoadConfigWithInvalidValues(t *testing.T) {
 	config = redmaple.LoadConfig()
 	if config.Port != -1 {
 		t.Errorf("expected PORT=-1 (invalid but parseable), got %d", config.Port)
-	}
-
-	t.Setenv("INFLUXDB_ENABLED", "invalid")
-	config = redmaple.LoadConfig()
-	if config.InfluxDB.Enabled != false {
-		t.Errorf("expected INFLUXDB_ENABLED=false (default), got %v", config.InfluxDB.Enabled)
-	}
-
-	t.Setenv("INFLUXDB_ENABLED", "maybe")
-	config = redmaple.LoadConfig()
-	if config.InfluxDB.Enabled != false {
-		t.Errorf("expected INFLUXDB_ENABLED=false (default), got %v", config.InfluxDB.Enabled)
 	}
 
 	t.Setenv("EXPORT_INTERVAL", "not-a-duration")

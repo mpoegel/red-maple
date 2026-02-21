@@ -18,7 +18,6 @@ type Config struct {
 	WeatherAPIKey    string
 	HomeAssistant    HomeAssistantConfig
 	ExportInterval   time.Duration
-	InfluxDB         InfluxDBConfig
 	S3               S3Config
 }
 
@@ -29,13 +28,6 @@ type HomeAssistantConfig struct {
 	OutdoorHumidityID string
 	IndoorTempID      string
 	IndoorHumidityID  string
-}
-
-type InfluxDBConfig struct {
-	Enabled  bool
-	Endpoint string
-	Token    string
-	Database string
 }
 
 type S3Config struct {
@@ -69,12 +61,6 @@ func LoadConfig() Config {
 			IndoorHumidityID:  loadStrEnv("HA_INDOOR_HUMID_ID", ""),
 		},
 		ExportInterval: loadDurationEnv("EXPORT_INTERVAL", 1*time.Minute),
-		InfluxDB: InfluxDBConfig{
-			Enabled:  loadBoolEnv("INFLUXDB_ENABLED", false),
-			Endpoint: loadStrEnv("INFLUXDB_ENDPOINT", ""),
-			Token:    loadStrEnv("INFLUXDB_TOKEN", ""),
-			Database: loadStrEnv("INFLUXDB_DATABASE", ""),
-		},
 		S3: S3Config{
 			Enabled:       loadBoolEnv("S3_ENABLED", false),
 			Endpoint:      loadStrEnv("S3_ENDPOINT", ""),
