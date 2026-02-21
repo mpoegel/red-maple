@@ -1,9 +1,10 @@
 package api
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 type Importer interface {
-	QueryLast24Hours(ctx context.Context, table string) ([]map[string]any, error)
-	QueryLast7Days(ctx context.Context, table string) ([]map[string]any, error)
-	QueryLast30Days(ctx context.Context, table string) ([]map[string]any, error)
+	QueryRange(ctx context.Context, table string, duration time.Duration) ([]*DataPoint, error)
 }

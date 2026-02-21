@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	api "github.com/mpoegel/red-maple/pkg/api"
 	citibike "github.com/mpoegel/red-maple/pkg/citibike"
 )
 
@@ -782,6 +783,43 @@ func (m *mockImporter) QueryLast7Days(ctx context.Context, table string) ([]map[
 
 func (m *mockImporter) QueryLast30Days(ctx context.Context, table string) ([]map[string]any, error) {
 	return m.data30Days, m.err
+}
+
+func (m *mockImporter) QueryRange(ctx context.Context, table string, duration time.Duration) ([]*api.DataPoint, error) {
+	var src []map[string]any
+	if duration <= 24*time.Hour {
+		src = m.data24Hours
+	} else if duration <= 7*24*time.Hour {
+		src = m.data7Days
+	} else {
+		src = m.data30Days
+	}
+
+	var results []*api.DataPoint
+	for _, row := range src {
+		point := &api.DataPoint{
+			Table:  table,
+			Tags:   make(map[api.DataTag]string),
+			Fields: make(map[string]any),
+		}
+		for k, v := range row {
+			if k == "time" {
+				if t, ok := v.(time.Time); ok {
+					point.Stamp = t
+				}
+				continue
+			}
+			if k == "location" {
+				if s, ok := v.(string); ok {
+					point.Tags[api.LocationTag] = s
+				}
+				continue
+			}
+			point.Fields[k] = v
+		}
+		results = append(results, point)
+	}
+	return results, m.err
 }
 
 func TestGetHistoricalBikeCounts24Hours_Success(t *testing.T) {

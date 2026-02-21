@@ -19,6 +19,7 @@ type Config struct {
 	HomeAssistant    HomeAssistantConfig
 	ExportInterval   time.Duration
 	InfluxDB         InfluxDBConfig
+	S3               S3Config
 }
 
 type HomeAssistantConfig struct {
@@ -35,6 +36,18 @@ type InfluxDBConfig struct {
 	Endpoint string
 	Token    string
 	Database string
+}
+
+type S3Config struct {
+	Enabled       bool
+	Endpoint      string
+	Scheme        string
+	Bucket        string
+	Region        string
+	AccessKey     string
+	SecretKey     string
+	RetentionDays int
+	FlushInterval time.Duration
 }
 
 func LoadConfig() Config {
@@ -61,6 +74,17 @@ func LoadConfig() Config {
 			Endpoint: loadStrEnv("INFLUXDB_ENDPOINT", ""),
 			Token:    loadStrEnv("INFLUXDB_TOKEN", ""),
 			Database: loadStrEnv("INFLUXDB_DATABASE", ""),
+		},
+		S3: S3Config{
+			Enabled:       loadBoolEnv("S3_ENABLED", false),
+			Endpoint:      loadStrEnv("S3_ENDPOINT", ""),
+			Scheme:        loadStrEnv("S3_SCHEME", "https"),
+			Bucket:        loadStrEnv("S3_BUCKET", ""),
+			Region:        loadStrEnv("S3_REGION", "us-east-1"),
+			AccessKey:     loadStrEnv("S3_ACCESS_KEY", ""),
+			SecretKey:     loadStrEnv("S3_SECRET_KEY", ""),
+			RetentionDays: loadIntEnv("S3_RETENTION_DAYS", 30),
+			FlushInterval: loadDurationEnv("S3_FLUSH_INTERVAL", 1*time.Minute),
 		},
 	}
 }

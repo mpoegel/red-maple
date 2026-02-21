@@ -2,6 +2,8 @@ package redmaple
 
 import (
 	"context"
+	"fmt"
+	"time"
 
 	influxdb3 "github.com/InfluxCommunity/influxdb3-go/v2/influxdb3"
 	lineprotocol "github.com/influxdata/line-protocol/v2/lineprotocol"
@@ -51,16 +53,41 @@ func (e *InfluxDBClient) Export(ctx context.Context, dataPoints []*api.DataPoint
 		influxdb3.WithPrecision(lineprotocol.Second))
 }
 
-func (e *InfluxDBClient) QueryLast24Hours(ctx context.Context, table string) ([]map[string]any, error) {
-	return e.queryTable(ctx, table, "24 hours")
-}
+func (e *InfluxDBClient) QueryRange(ctx context.Context, table string, duration time.Duration) ([]*api.DataPoint, error) {
+	d := fmt.Sprintf("%.0f seconds", duration.Seconds())
+	query := "SELECT * FROM " + table + " WHERE time >= now() - interval '" + d + "'"
+	iterator, err := e.client.Query(ctx, query)
+	if err != nil {
+		return nil, err
+	}
 
-func (e *InfluxDBClient) QueryLast7Days(ctx context.Context, table string) ([]map[string]any, error) {
-	return e.queryTable(ctx, table, "7 days")
-}
+	var results []*api.DataPoint
+	for iterator.Next() {
+		row := iterator.Value()
 
-func (e *InfluxDBClient) QueryLast30Days(ctx context.Context, table string) ([]map[string]any, error) {
-	return e.queryTable(ctx, table, "30 days")
+		point := &api.DataPoint{
+			Table:  table,
+			Tags:   make(map[api.DataTag]string),
+			Fields: make(map[string]any),
+		}
+
+		if v, ok := row["time"]; ok {
+			if t, ok := v.(time.Time); ok {
+				point.Stamp = t
+			}
+		}
+
+		for k, v := range row {
+			if k == "time" {
+				continue
+			}
+			point.Fields[k] = v
+		}
+
+		results = append(results, point)
+	}
+
+	return results, iterator.Err()
 }
 
 func (e *InfluxDBClient) queryTable(ctx context.Context, table, duration string) ([]map[string]any, error) {

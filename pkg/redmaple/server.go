@@ -16,6 +16,7 @@ import (
 	api "github.com/mpoegel/red-maple/pkg/api"
 	citibike "github.com/mpoegel/red-maple/pkg/citibike"
 	ha "github.com/mpoegel/red-maple/pkg/homeassistant"
+	"github.com/mpoegel/red-maple/pkg/s3"
 	subway "github.com/mpoegel/red-maple/pkg/subway"
 	weather "github.com/mpoegel/red-maple/pkg/weather"
 )
@@ -82,6 +83,21 @@ func NewServer(config Config) (*Server, error) {
 		}
 		s.exportHub.AddExporter(client)
 		s.importer = client
+	} else if config.S3.Enabled {
+		client, err := s3.NewClient(
+			s3.WithBucket(config.S3.Bucket),
+			s3.WithCredentials(config.S3.AccessKey, config.S3.SecretKey),
+			s3.WithEndpoint(config.S3.Endpoint),
+			s3.WithScheme(config.S3.Scheme),
+			s3.WithFlushInterval(config.S3.FlushInterval),
+			s3.WithRegion(config.S3.Region),
+			s3.WithRetentionDays(config.S3.RetentionDays),
+		)
+		if err != nil {
+			return nil, err
+		}
+		s.exportHub.AddExporter(client)
+		s.importer = client
 	}
 	s.exportHub.AddProvider(s.haClient.GetProvider(
 		s.config.HomeAssistant.IndoorTempID,
@@ -133,7 +149,7 @@ func (s *Server) Start(ctx context.Context) error {
 	})
 
 	// start the HTTP server
-	slog.Debug("listening", "addr", s.s.Addr)
+	slog.Info("listening", "addr", s.s.Addr)
 	if err := s.s.ListenAndServe(); err != http.ErrServerClosed {
 		slog.Error("http listen error", "error", err)
 		return err

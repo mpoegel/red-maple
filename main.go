@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"log/slog"
 	"os"
 	"os/signal"
@@ -18,7 +19,16 @@ func main() {
 }
 
 func run() error {
-	slog.SetLogLoggerLevel(slog.LevelDebug)
+	verbose := flag.Bool("verbose", false, "enable debug logging")
+
+	flag.Parse()
+
+	if *verbose {
+		slog.SetLogLoggerLevel(slog.LevelDebug)
+	} else {
+		slog.SetLogLoggerLevel(slog.LevelInfo)
+	}
+
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
 
