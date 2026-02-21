@@ -195,8 +195,6 @@ func TestGetProvider_Success(t *testing.T) {
 			State:    "65",
 		},
 	}
-	states[0].Attributes.FriendlyName = "Outdoor Temperature"
-	states[1].Attributes.FriendlyName = "Outdoor Humidity"
 
 	mt := &mockTransport{
 		responseBody: mustJSON(states[0]),
@@ -232,11 +230,11 @@ func TestGetProvider_Success(t *testing.T) {
 	if data.Tags["location"] != "home" {
 		t.Errorf("expected location tag 'home', got %s", data.Tags["location"])
 	}
-	if data.Fields["Outdoor Temperature"] != "72.5" {
-		t.Errorf("expected 'Outdoor Temperature' = '72.5', got %v", data.Fields["Outdoor Temperature"])
+	if data.Fields["sensor.outdoor_temp"] != "72.5" {
+		t.Errorf("expected 'sensor.outdoor_temp' = '72.5', got %v", data.Fields["sensor.outdoor_temp"])
 	}
-	if data.Fields["Outdoor Humidity"] != "65" {
-		t.Errorf("expected 'Outdoor Humidity' = '65', got %v", data.Fields["Outdoor Humidity"])
+	if data.Fields["sensor.outdoor_humidity"] != "65" {
+		t.Errorf("expected 'sensor.outdoor_humidity' = '65', got %v", data.Fields["sensor.outdoor_humidity"])
 	}
 	if data.Stamp.IsZero() {
 		t.Error("expected non-zero timestamp")
@@ -248,7 +246,6 @@ func TestGetProvider_OneDeviceFails(t *testing.T) {
 		EntityID: "sensor.outdoor_temp",
 		State:    "72.5",
 	}
-	goodState.Attributes.FriendlyName = "Outdoor Temperature"
 
 	mt := &mockTransport{
 		err:        io.EOF,
@@ -277,8 +274,8 @@ func TestGetProvider_OneDeviceFails(t *testing.T) {
 	if err != nil {
 		t.Fatalf("expected no error (continues on failure), got %v", err)
 	}
-	if data.Fields["Outdoor Temperature"] != "72.5" {
-		t.Errorf("expected 'Outdoor Temperature' = '72.5', got %v", data.Fields["Outdoor Temperature"])
+	if data.Fields["sensor.outdoor_temp"] != "72.5" {
+		t.Errorf("expected 'sensor.outdoor_temp' = '72.5', got %v", data.Fields["sensor.outdoor_temp"])
 	}
 	if _, ok := data.Fields["sensor.bad_device"]; ok {
 		t.Error("expected bad_device to not be in fields")
@@ -318,7 +315,6 @@ func TestGetProvider_SingleDevice(t *testing.T) {
 		EntityID: "sensor.indoor_temp",
 		State:    "70.0",
 	}
-	state.Attributes.FriendlyName = "Indoor Temperature"
 
 	mt := &mockTransport{
 		responseBody: mustJSON(state),
@@ -337,8 +333,8 @@ func TestGetProvider_SingleDevice(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if data.Fields["Indoor Temperature"] != "70.0" {
-		t.Errorf("expected 'Indoor Temperature' = '70.0', got %v", data.Fields["Indoor Temperature"])
+	if data.Fields["sensor.indoor_temp"] != "70.0" {
+		t.Errorf("expected 'sensor.indoor_temp' = '70.0', got %v", data.Fields["sensor.indoor_temp"])
 	}
 }
 

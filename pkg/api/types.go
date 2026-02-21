@@ -86,6 +86,18 @@ type IndoorPartial struct {
 
 type OutdoorPartial IndoorPartial
 
+type IndoorHistory struct {
+	Days      int
+	DataName  string
+	MaxY      int
+	MinY      int
+	Data      []GraphPoint
+	StartTime string
+	EndTime   string
+}
+
+type OutdoorHistory IndoorHistory
+
 type SunrisePartial struct {
 	SunriseTime   string
 	SunsetTime    string

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"strconv"
 	"sync"
 	"time"
 
@@ -16,6 +17,7 @@ type Client interface {
 	GetDeviceState(ctx context.Context, deviceID string) (*DeviceState, error)
 	DeviceCache(deviceID string) *DeviceState
 	GetProvider(deviceIDs ...string) api.ProviderFunc
+	GetDeviceHistory(ctx context.Context, importer api.Importer, deviceID string, duration time.Duration) ([]DeviceHistory, error)
 }
 
 type ClientImpl struct {
@@ -97,7 +99,7 @@ func (c *ClientImpl) DeviceCache(deviceID string) *DeviceState {
 func (c *ClientImpl) GetProvider(deviceIDs ...string) api.ProviderFunc {
 	return func(ctx context.Context) (*api.DataPoint, error) {
 		data := &api.DataPoint{
-			Table: "home-assistant",
+			Table: tableName,
 			Tags: map[api.DataTag]string{
 				api.LocationTag: "home",
 			},
@@ -110,8 +112,48 @@ func (c *ClientImpl) GetProvider(deviceIDs ...string) api.ProviderFunc {
 				slog.Warn("failed to capture device state", "deviceID", deviceID, "err", err)
 				continue
 			}
-			data.Fields[state.Attributes.FriendlyName] = state.State
+			data.Fields[deviceID] = state.State
 		}
+		slog.Debug("exporting device devices", "data", data)
 		return data, nil
 	}
+}
+
+func (c *ClientImpl) GetDeviceHistory(ctx context.Context, importer api.Importer, deviceID string, duration time.Duration) ([]DeviceHistory, error) {
+	rows, err := importer.QueryRange(ctx, tableName, duration)
+	if err != nil {
+		return nil, err
+	}
+
+	var results []DeviceHistory
+	for _, row := range rows {
+		slog.Debug("parsing device row", "row", row)
+
+		var reading float64
+		if readingVal, ok := row.Fields[deviceID]; ok {
+			switch v := readingVal.(type) {
+			case int64:
+				reading = float64(v)
+			case float64:
+				reading = float64(v)
+			case string:
+				reading, err = strconv.ParseFloat(v, 64)
+				if err != nil {
+					slog.Warn("cannot parse device state", "err", err)
+				}
+			default:
+				slog.Warn("unknown device state type", "type", fmt.Sprintf("%T", readingVal))
+			}
+		} else {
+			slog.Warn("device not found", "id", deviceID)
+			continue
+		}
+
+		results = append(results, DeviceHistory{
+			Value: reading,
+			Stamp: row.Stamp,
+		})
+	}
+
+	return results, nil
 }

@@ -1,5 +1,7 @@
 package citibike
 
+import "time"
+
 type StationStatusResponse struct {
 	Data struct {
 		Stations []StationStatus `json:"stations"`
@@ -60,4 +62,15 @@ type VehicleTypesResponse struct {
 	LastUpdated int    `json:"last_updated"`
 	TimeToLive  int    `json:"ttl"`
 	Version     string `json:"version"`
+}
+
+const (
+	classicBikeID = "1"
+	eBikeID       = "2"
+)
+
+type HistoricalBikeCount struct {
+	Classics int
+	Ebikes   int
+	Stamp    time.Time
 }

@@ -19,3 +19,12 @@ type DeviceState struct {
 		UserID   string `json:"user_id"`
 	} `json:"context"`
 }
+
+type DeviceHistory struct {
+	Value float64
+	Stamp time.Time
+}
+
+const (
+	tableName = "home-assistant"
+)

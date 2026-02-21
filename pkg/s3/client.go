@@ -322,6 +322,8 @@ func (c *Client) getObjectKeysForRange(table string, start, end time.Time) []str
 		current = current.Add(1 * time.Hour)
 	}
 
+	keys = append(keys, c.getObjectKey(current, table))
+	slog.Debug("loaded keys", "keys", keys)
 	return keys
 }
 

@@ -25,3 +25,82 @@
     </span>
 </div>
 {{end}}
+
+{{define "OutdoorHistory"}}
+<div class="graph-full">
+    <div class="graph-header">
+        <span hx-get="/x/outdoor/history?days=30&dataname={{.DataName}}" hx-target="#outdoor-history"
+            hx-trigger="click">
+            {{if eq .Days 30}}[{{end}}30 DAYS{{if eq .Days 30}}]{{end}}</span>
+        <span hx-get="/x/outdoor/history?days=7&dataname={{.DataName}}" hx-target="#outdoor-history" hx-trigger="click">
+            {{if eq .Days 7}}[{{end}}7 DAYS{{if eq .Days 7}}]{{end}}</span>
+        <span hx-get="/x/outdoor/history?days=1&dataname={{.DataName}}" hx-target="#outdoor-history" hx-trigger="click">
+            {{if eq .Days 1}}[{{end}}24 HOURS{{if eq .Days 1}}]{{end}}</span>
+    </div>
+    <div class="graph-top">
+        <div class="graph-y-axis">
+            <div class="graph-y-max">{{.MaxY}}</div>
+            <div class="graph-y-min">{{.MinY}}</div>
+        </div>
+        <div class="graph-area">
+            {{range .Data}}
+            <span class="graph-col"
+                style="margin-bottom: {{.Min}}px; height: {{.Max}}px; width: {{.Width}}%;">&nbsp;</span>
+            {{end}}
+        </div>
+    </div>
+    <div class="graph-bottom">
+        <div class="graph-x-axis">
+            <span class="graph-x-min">{{.StartTime}}</span>
+            <span class="graph-x-max">{{.EndTime}}</span>
+        </div>
+        <div class="graph-data-selection">
+            <span hx-get="/x/outdoor/history?days={{.Days}}&dataname=temperature" hx-target="#outdoor-history"
+                hx-trigger="click">
+                {{if eq .DataName "temperature"}}[{{end}}Temperature{{if eq .DataName "temperature"}}]{{end}}</span>
+            <span hx-get="/x/outdoor/history?days={{.Days}}&dataname=humidity" hx-target="#outdoor-history"
+                hx-trigger="click">
+                {{if eq .DataName "humidity"}}[{{end}}Humidity{{if eq .DataName "humidity"}}]{{end}}</span>
+        </div>
+    </div>
+</div>
+{{end}}
+
+{{define "IndoorHistory"}}
+<div class="graph-full">
+    <div class="graph-header">
+        <span hx-get="/x/indoor/history?days=30&dataname={{.DataName}}" hx-target="#indoor-history" hx-trigger="click">
+            {{if eq .Days 30}}[{{end}}30 DAYS{{if eq .Days 30}}]{{end}}</span>
+        <span hx-get="/x/indoor/history?days=7&dataname={{.DataName}}" hx-target="#indoor-history" hx-trigger="click">
+            {{if eq .Days 7}}[{{end}}7 DAYS{{if eq .Days 7}}]{{end}}</span>
+        <span hx-get="/x/indoor/history?days=1&dataname={{.DataName}}" hx-target="#indoor-history" hx-trigger="click">
+            {{if eq .Days 1}}[{{end}}24 HOURS{{if eq .Days 1}}]{{end}}</span>
+    </div>
+    <div class="graph-top">
+        <div class="graph-y-axis">
+            <div class="graph-y-max">{{.MaxY}}</div>
+            <div class="graph-y-min">{{.MinY}}</div>
+        </div>
+        <div class="graph-area">
+            {{range .Data}}
+            <span class="graph-col"
+                style="margin-bottom: {{.Min}}px; height: {{.Max}}px; width: {{.Width}}%;">&nbsp;</span>
+            {{end}}
+        </div>
+    </div>
+    <div class="graph-bottom">
+        <div class="graph-x-axis">
+            <span class="graph-x-min">{{.StartTime}}</span>
+            <span class="graph-x-max">{{.EndTime}}</span>
+        </div>
+        <div class="graph-data-selection">
+            <span hx-get="/x/indoor/history?days={{.Days}}&dataname=temperature" hx-target="#indoor-history"
+                hx-trigger="click">
+                {{if eq .DataName "temperature"}}[{{end}}Temperature{{if eq .DataName "temperature"}}]{{end}}</span>
+            <span hx-get="/x/indoor/history?days={{.Days}}&dataname=humidity" hx-target="#indoor-history"
+                hx-trigger="click">
+                {{if eq .DataName "humidity"}}[{{end}}Humidity{{if eq .DataName "humidity"}}]{{end}}</span>
+        </div>
+    </div>
+</div>
+{{end}}

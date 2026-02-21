@@ -217,17 +217,6 @@ func (c *ClientImpl) GetNumBikesAtStation(ctx context.Context, name string) (num
 	return
 }
 
-const (
-	classicBikeID = "1"
-	eBikeID       = "2"
-)
-
-type HistoricalBikeCount struct {
-	Classics int
-	Ebikes   int
-	Stamp    time.Time
-}
-
 func countBikes(stationStatus *StationStatus, bikeType string) int {
 	for _, id := range stationStatus.VehicleTypesAvailable {
 		if id.VehicleTypeID == bikeType {

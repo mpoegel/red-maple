@@ -16,7 +16,7 @@ import (
 	api "github.com/mpoegel/red-maple/pkg/api"
 	citibike "github.com/mpoegel/red-maple/pkg/citibike"
 	ha "github.com/mpoegel/red-maple/pkg/homeassistant"
-	"github.com/mpoegel/red-maple/pkg/s3"
+	s3 "github.com/mpoegel/red-maple/pkg/s3"
 	subway "github.com/mpoegel/red-maple/pkg/subway"
 	weather "github.com/mpoegel/red-maple/pkg/weather"
 )
@@ -121,7 +121,9 @@ func (s *Server) LoadRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /x/subwayline", s.HandleSubwayLine)
 	mux.HandleFunc("GET /x/weather", s.HandleWeather)
 	mux.HandleFunc("GET /x/indoor", s.HandleIndoor)
+	mux.HandleFunc("GET /x/indoor/history", s.HandleIndoorHistory)
 	mux.HandleFunc("GET /x/outdoor", s.HandleOutdoor)
+	mux.HandleFunc("GET /x/outdoor/history", s.HandleOutdoorHistory)
 	mux.HandleFunc("GET /x/sunrise", s.HandleSunrise)
 	mux.HandleFunc("GET /x/sundial", s.HandleSundial)
 	mux.HandleFunc("GET /x/forecast", s.HandleForecastFull)
