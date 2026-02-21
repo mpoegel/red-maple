@@ -1,6 +1,6 @@
 package main
 
-// This tool generates and writes historical test data to InfluxDB for testing purposes.
+// This tool generates and writes historical test data to S3 for testing purposes.
 // Currently generates random Citibike station data with classics and ebikes counts.
 
 import (
@@ -14,6 +14,7 @@ import (
 
 	api "github.com/mpoegel/red-maple/pkg/api"
 	redmaple "github.com/mpoegel/red-maple/pkg/redmaple"
+	s3 "github.com/mpoegel/red-maple/pkg/s3"
 )
 
 type WriteOpts struct {
@@ -93,11 +94,16 @@ func run() error {
 	interval := flag.Int("interval", 5, "minutes between readings")
 	baseClassics := flag.Int("base-classics", 25, "starting classics count (0-50)")
 	baseEbikes := flag.Int("base-ebikes", 25, "starting ebikes count (0-50)")
-	dryRun := flag.Bool("dry-run", false, "print what would be written without writing to InfluxDB")
+	dryRun := flag.Bool("dry-run", false, "print what would be written without writing")
+	verbose := flag.Bool("verbose", false, "enable debug logging")
 
 	flag.Parse()
 
-	slog.SetLogLoggerLevel(slog.LevelInfo)
+	if *verbose {
+		slog.SetLogLoggerLevel(slog.LevelDebug)
+	} else {
+		slog.SetLogLoggerLevel(slog.LevelInfo)
+	}
 
 	if *days < 1 || *days > 30 {
 		slog.Error("days must be between 1 and 30")
@@ -105,6 +111,11 @@ func run() error {
 	}
 
 	cfg := redmaple.LoadConfig()
+
+	if !cfg.S3.Enabled {
+		slog.Error("S3 is not enabled. Set S3_ENABLED=true and configure S3_ENDPOINT, S3_BUCKET, S3_ACCESS_KEY, S3_SECRET_KEY")
+		return fmt.Errorf("S3 is not enabled")
+	}
 
 	stationList := *stations
 	if stationList == "" {
@@ -159,19 +170,22 @@ func run() error {
 		return nil
 	}
 
-	if !cfg.InfluxDB.Enabled {
-		slog.Error("InfluxDB is not enabled. Set INFLUXDB_ENABLED=true and configure INFLUXDB_ENDPOINT, INFLUXDB_TOKEN, INFLUXDB_DATABASE")
-		return fmt.Errorf("InfluxDB is not enabled")
-	}
-
-	influxClient, err := redmaple.NewInfluxDBClient(&cfg.InfluxDB)
+	s3Client, err := s3.NewClient(
+		s3.WithBucket(cfg.S3.Bucket),
+		s3.WithCredentials(cfg.S3.AccessKey, cfg.S3.SecretKey),
+		s3.WithEndpoint(cfg.S3.Endpoint),
+		s3.WithScheme(cfg.S3.Scheme),
+		s3.WithFlushInterval(cfg.S3.FlushInterval),
+		s3.WithRegion(cfg.S3.Region),
+		s3.WithRetentionDays(cfg.S3.RetentionDays),
+	)
 	if err != nil {
-		slog.Error("failed to create InfluxDB client", "err", err)
+		slog.Error("failed to create S3 client", "err", err)
 		return err
 	}
-	defer influxClient.Close()
+	defer s3Client.Close()
 
-	slog.Info("writing to InfluxDB", "database", cfg.InfluxDB.Database)
+	slog.Info("writing to S3", "bucket", cfg.S3.Bucket)
 
 	const batchSize = 1000
 	for i := 0; i < len(points); i += batchSize {
@@ -180,7 +194,15 @@ func run() error {
 			end = len(points)
 		}
 		batch := points[i:end]
-		if err := influxClient.Export(context.Background(), batch); err != nil {
+		for _, p := range batch {
+			slog.Debug("exporting data point",
+				"table", p.Table,
+				"location", p.Tags[api.LocationTag],
+				"classics", p.Fields["classics"],
+				"ebikes", p.Fields["ebikes"],
+				"time", p.Stamp)
+		}
+		if err := s3Client.Export(context.Background(), batch); err != nil {
 			slog.Error("failed to write batch", "err", err, "batchSize", len(batch))
 			return err
 		}
