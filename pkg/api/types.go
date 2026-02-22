@@ -185,3 +185,11 @@ type SubwaySegment struct {
 	NoServiceNorth bool
 	NoServiceSouth bool
 }
+
+type BikeBridges struct {
+	Queensboro   int
+	Williamsburg int
+	Manhattan    int
+	Brooklyn     int
+	Range        string
+}

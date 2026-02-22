@@ -7,34 +7,7 @@
 <body>
     <div class="grid" id="main-grid">
         <div class="grid-cell-2xn grid-cell-2xn-tall" id="bike-history" hx-get="/bikes/history" hx-trigger="load"></div>
-        <div class="grid-cell-2xn grid-cell-2xn-tall">
-            <div class="east-river-bike-map-title">East River Bicycle Crossings</div>
-            <pre class="east-river-bike-map">
-▌       ▌
-▙▄▄▄▄▄▄▄▌    Queensboro Bridge: 12043
-▌       ▌
-▌       ▌
-▌       ▌
-▚       ▚
- ▚       ▚
-  ▚       ▚
-   ▚       ▚
-    ▚       ▚
-     ▚       ▚
-     ▐       ▐
-     ▐▄▄▄▄▄▄▄▟    Williamsburg Bridge: 10506
-     ▐       ▐
-     ▐       ▐
-     ▐       ▐
-     ▟       ▞
-    ▞▀▜▄    ▞
-   ▞   ▀▀▙▄▟    Manhattan Bridge: 5004
-  ▟▄▄▄    ▞
- ▞   ▀▙▄▄▟    Brooklyn Bridge: 7506
-▞        ▌
-▌        ▌
-</pre>
-            <div class="east-river-bike-controls">[Daily] Monthly Year-To-Date</div>
+        <div class="grid-cell-2xn grid-cell-2xn-tall" id="bike-bridges" hx-get="/x/bikes/bridges" hx-trigger="load">
         </div>
         <div class="grid-cell-2xn" hx-get="/x/datetime" hx-trigger="load, every 1s"></div>
         <div class="grid-cell-2xn">

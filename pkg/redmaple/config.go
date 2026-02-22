@@ -19,6 +19,8 @@ type Config struct {
 	HomeAssistant    HomeAssistantConfig
 	ExportInterval   time.Duration
 	S3               S3Config
+	NycDataAppKey    string
+	CacheDir         string
 }
 
 type HomeAssistantConfig struct {
@@ -72,6 +74,8 @@ func LoadConfig() Config {
 			RetentionDays: loadIntEnv("S3_RETENTION_DAYS", 30),
 			FlushInterval: loadDurationEnv("S3_FLUSH_INTERVAL", 1*time.Minute),
 		},
+		NycDataAppKey: loadStrEnv("NYCDATA_APP_KEY", ""),
+		CacheDir:      loadStrEnv("CACHE_DIR", ".cache"),
 	}
 }
 

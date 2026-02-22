@@ -1,0 +1,33 @@
+{{define "BikeBridges"}}
+<div class="east-river-bike-map-title">East River Bicycle Crossings</div>
+<pre class="east-river-bike-map">
+▌       ▌
+▙▄▄▄▄▄▄▄▌    Queensboro Bridge: {{.Queensboro}}
+▌       ▌
+▌       ▌
+▌       ▌
+▚       ▚
+ ▚       ▚
+  ▚       ▚
+   ▚       ▚
+    ▚       ▚
+     ▚       ▚
+     ▐       ▐
+     ▐▄▄▄▄▄▄▄▟    Williamsburg Bridge: {{.Williamsburg}}
+     ▐       ▐
+     ▐       ▐
+     ▐       ▐
+     ▟       ▞
+    ▞▀▜▄    ▞
+   ▞   ▀▀▙▄▟    Manhattan Bridge: {{.Manhattan}}
+  ▟▄▄▄    ▞
+ ▞   ▀▙▄▄▟    Brooklyn Bridge: {{.Brooklyn}}
+▞        ▌
+▌        ▌
+</pre>
+<div class="east-river-bike-controls">
+    <span hx-get="/x/bikes/bridges?range=monthly" hx-target="#bike-bridges" hx-trigger="click">
+        {{if eq .Range "monthly"}}[{{end}}Monthly{{if eq .Range "monthly"}}]{{end}}</span>
+    <span hx-get="/x/bikes/bridges?range=year-to-date" hx-target="#bike-bridges" hx-trigger="click">
+        {{if eq .Range "year-to-date"}}[{{end}}Year-To-Date{{if eq .Range "year-to-date"}}]{{end}}</span>
+    {{end}}

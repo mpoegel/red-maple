@@ -16,6 +16,7 @@ import (
 	api "github.com/mpoegel/red-maple/pkg/api"
 	citibike "github.com/mpoegel/red-maple/pkg/citibike"
 	ha "github.com/mpoegel/red-maple/pkg/homeassistant"
+	nycdata "github.com/mpoegel/red-maple/pkg/nycdata"
 	s3 "github.com/mpoegel/red-maple/pkg/s3"
 	subway "github.com/mpoegel/red-maple/pkg/subway"
 	weather "github.com/mpoegel/red-maple/pkg/weather"
@@ -31,6 +32,7 @@ type Server struct {
 	subwayCli  subway.Client
 	weatherCli weather.Client
 	haClient   ha.Client
+	nycClient  nycdata.Client
 
 	exportHub *ExportHub
 	importer  api.Importer
@@ -73,6 +75,7 @@ func NewServer(config Config) (*Server, error) {
 		subwayCli:  subwayCli,
 		weatherCli: weather.NewClient(weatherLat, weatherLon, config.WeatherAPIKey),
 		haClient:   ha.NewClient(config.HomeAssistant.Endpoint, config.HomeAssistant.APIKey),
+		nycClient:  nycdata.NewClient(nycdata.WithAppToken(config.NycDataAppKey), nycdata.WithFilesystemCache(path.Join(config.CacheDir, "nycdata"))),
 		exportHub:  NewExportHub(config.ExportInterval),
 	}
 
@@ -114,6 +117,7 @@ func (s *Server) LoadRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /sunrise", s.HandleSunriseFull)
 	mux.HandleFunc("GET /bikes", s.HandleBikesFull)
 	mux.HandleFunc("GET /bikes/history", s.HandleCitiBikeHistory)
+	mux.HandleFunc("GET /x/bikes/bridges", s.HandleBikeBridges)
 	mux.HandleFunc("GET /weather", s.HandleWeatherFull)
 	mux.HandleFunc("GET /x/datetime", s.HandleDatetime)
 	mux.HandleFunc("GET /x/citibike", s.HandleCitibike)
