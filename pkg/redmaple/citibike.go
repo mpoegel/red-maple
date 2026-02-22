@@ -104,6 +104,7 @@ func (s *Server) HandleCitiBikeHistory(w http.ResponseWriter, r *http.Request) {
 		minY = min(minY, b.Min)
 		maxY = max(maxY, b.Max)
 	}
+	// maxY++
 
 	yDiff := maxY - minY
 	for _, b := range buckets {

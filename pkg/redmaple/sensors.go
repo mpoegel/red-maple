@@ -183,6 +183,8 @@ func (s *Server) HandleSensorHistory(w http.ResponseWriter, r *http.Request, reg
 		minY = min(minY, b.Min)
 		maxY = max(maxY, b.Max)
 	}
+	minY--
+	maxY++
 
 	yDiff := max(1, maxY-minY)
 	for _, b := range buckets {

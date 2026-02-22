@@ -54,11 +54,15 @@
     align-items: flex-end;
     border: 2px solid black;
     border-bottom: 7px solid black;
+    background-image: url('/static/img/grid.svg');
+    background-repeat: repeat;
 }
 
 .graph-col {
     display: inline-block;
-    background-color: black;
+    background: linear-gradient(to right, transparent 30%, black 30%, black 70%, transparent 70%);
+    border-top: 2px solid black;
+    border-bottom: 2px solid black;
 }
 
 .graph-cell {
